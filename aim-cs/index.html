@@ -4,6 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>AIM//CS — Treino de Mira para CS2</title>
+<meta name="theme-color" content="#0b0f16">
+<meta name="description" content="Treino de mira no navegador com a sensibilidade exata do CS2.">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -12,87 +17,107 @@
   --accent:#f5a524; --accent2:#2fd4ff; --good:#3dff8a; --bad:#ff5468;
 }
 *{box-sizing:border-box}
-html,body{margin:0;height:100%;background:var(--bg);color:var(--text);font-family:Inter,system-ui,sans-serif;overflow:hidden}
-#game{position:fixed;inset:0;width:100vw;height:100vh;display:block}
-#xhair{position:fixed;left:50%;top:50%;width:96px;height:96px;transform:translate(-50%,-50%);pointer-events:none;z-index:5;display:none}
+html,body{margin:0;height:100%;background:#000;color:var(--text);font-family:Inter,system-ui,sans-serif;overflow:hidden}
+#game{position:fixed;top:0;left:0;display:block}
+#xhair{position:fixed;left:50%;top:50%;width:160px;height:160px;transform:translate(-50%,-50%);pointer-events:none;z-index:5;display:none}
 #hitmarker{position:fixed;left:50%;top:50%;width:34px;height:34px;transform:translate(-50%,-50%);pointer-events:none;z-index:6;opacity:0}
 #hitmarker.show{animation:hm .18s ease-out}
+#hitmarker.head line{stroke:#ff5468}
 @keyframes hm{0%{opacity:1;transform:translate(-50%,-50%) scale(1.15)}100%{opacity:0;transform:translate(-50%,-50%) scale(.9)}}
 .hidden{display:none!important}
 
 /* HUD */
-#hud{position:fixed;inset:0;pointer-events:none;z-index:4;display:none;font-family:Rajdhani,sans-serif}
+#hud{position:fixed;inset:0;pointer-events:none;z-index:4;display:none;font-family:Rajdhani,Inter,sans-serif}
 #hudTop{position:absolute;top:18px;left:50%;transform:translateX(-50%);display:flex;gap:10px}
-.hbox{background:rgba(10,14,20,.72);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:6px 16px;text-align:center;min-width:92px}
+.hbox{background:rgba(10,14,20,.72);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:6px 16px;text-align:center;min-width:96px}
 .hbox .k{font-size:11px;letter-spacing:.14em;color:var(--muted);text-transform:uppercase;font-family:Inter}
 .hbox .v{font-size:28px;font-weight:700;line-height:1.1}
 #hudTimer .v{color:var(--accent)}
 #hudBottom{position:absolute;bottom:16px;left:20px;font-size:15px;color:var(--muted);letter-spacing:.04em}
 #hudBottom b{color:var(--text)}
 #hudFps{position:absolute;top:12px;right:16px;font-size:13px;color:var(--muted);font-family:Inter}
-#hudAmmo{position:absolute;bottom:16px;right:24px;font-size:42px;font-weight:700}
+#hudAmmo{position:absolute;bottom:16px;right:24px;font-size:42px;font-weight:700;text-align:right}
 #hudAmmo small{font-size:20px;color:var(--muted)}
-#countdown{position:fixed;left:50%;top:38%;transform:translate(-50%,-50%);font-family:Rajdhani;font-size:120px;font-weight:700;color:var(--accent);z-index:7;pointer-events:none;text-shadow:0 4px 30px rgba(0,0,0,.6)}
-#countdown small{display:block;font-size:22px;color:var(--text);text-align:center;letter-spacing:.1em}
+#hudAmmo .w{display:block;font-size:14px;color:var(--muted);letter-spacing:.1em}
+#hudSpeed{position:absolute;bottom:70px;left:50%;transform:translateX(-50%);text-align:center}
+#hudSpeed .v{font-size:40px;font-weight:700;line-height:1}
+#hudSpeed .k{font-size:12px;color:var(--muted);font-family:Inter;letter-spacing:.1em}
+#hudPrompt{position:absolute;top:63%;left:50%;transform:translateX(-50%);font-size:22px;font-weight:600;letter-spacing:.05em;text-shadow:0 2px 12px rgba(0,0,0,.8);white-space:nowrap}
+#countdown{position:fixed;left:50%;top:38%;transform:translate(-50%,-50%);font-family:Rajdhani,Inter,sans-serif;font-size:120px;font-weight:700;color:var(--accent);z-index:7;pointer-events:none;text-shadow:0 4px 30px rgba(0,0,0,.6);text-align:center}
+#countdown small{display:block;font-size:22px;color:var(--text);letter-spacing:.1em}
 
 /* Overlays */
-.overlay{position:fixed;inset:0;z-index:10;display:flex;align-items:center;justify-content:center;background:rgba(6,9,14,.78);backdrop-filter:blur(6px);overflow:auto;padding:24px}
+.overlay{position:fixed;inset:0;z-index:10;display:flex;align-items:center;justify-content:center;background:rgba(6,9,14,.82);backdrop-filter:blur(6px);overflow:auto;padding:24px}
 #menu{align-items:flex-start}
-.wrap{width:min(1180px,100%);margin:auto}
+.wrap{width:min(1240px,100%);margin:auto}
 header.top{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:18px;flex-wrap:wrap}
-.logo{font-family:Rajdhani;font-weight:700;font-size:44px;letter-spacing:.04em;line-height:1}
+.logo{font-family:Rajdhani,Inter,sans-serif;font-weight:700;font-size:44px;letter-spacing:.04em;line-height:1}
 .logo span{color:var(--accent)}
 .sub{color:var(--muted);font-size:14px;margin-top:4px}
-.grid{display:grid;grid-template-columns:340px 1fr;gap:18px}
-@media (max-width:900px){.grid{grid-template-columns:1fr}}
+.grid{display:grid;grid-template-columns:360px 1fr;gap:18px}
+@media (max-width:940px){.grid{grid-template-columns:1fr}}
+.col{display:flex;flex-direction:column;gap:18px}
 .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px}
-.card h3{margin:0 0 12px;font-family:Rajdhani;font-size:19px;letter-spacing:.06em;text-transform:uppercase;color:var(--text)}
+.card h3{margin:0 0 12px;font-family:Rajdhani,Inter,sans-serif;font-size:19px;letter-spacing:.06em;text-transform:uppercase;color:var(--text)}
+.card h4{margin:14px 0 6px;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);font-weight:600}
 .field{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:9px 0;font-size:13.5px}
 .field label{color:var(--muted)}
-.field input[type=number],.field select{width:110px;background:var(--panel2);border:1px solid var(--line);color:var(--text);border-radius:7px;padding:7px 9px;font:inherit}
-.field input[type=range]{width:130px;accent-color:var(--accent)}
+.field .val{font-family:Rajdhani,Inter,sans-serif;font-weight:700;width:34px;text-align:right;color:var(--text)}
+.field input[type=number],.field select,.field input[type=text]{width:130px;background:var(--panel2);border:1px solid var(--line);color:var(--text);border-radius:7px;padding:7px 9px;font:inherit}
+.field input[type=range]{width:120px;accent-color:var(--accent)}
 .field input[type=checkbox]{accent-color:var(--accent);width:16px;height:16px}
+.field input[type=color]{width:34px;height:26px;border:1px solid var(--line);border-radius:6px;background:var(--panel2);padding:0}
 .derived{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0 4px}
-.derived div{background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:8px 10px}
+.derived>div{background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:8px 10px}
 .derived .k{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em}
-.derived .v{font-family:Rajdhani;font-size:22px;font-weight:700}
+.derived .v{font-family:Rajdhani,Inter,sans-serif;font-size:22px;font-weight:700}
 .hint{font-size:12px;color:var(--muted);line-height:1.45;margin:6px 0 0}
 .sep{height:1px;background:var(--line);margin:14px 0}
-.swatches{display:flex;gap:6px}
+.swatches{display:flex;gap:6px;align-items:center}
 .sw{width:22px;height:22px;border-radius:6px;border:2px solid transparent;cursor:pointer}
 .sw.on{border-color:#fff}
-.xprev{display:flex;align-items:center;justify-content:center;background:#2a3140;border-radius:8px;height:80px;margin-top:6px;background-image:linear-gradient(45deg,#3a4458 25%,transparent 25%),linear-gradient(-45deg,#3a4458 25%,transparent 25%);background-size:16px 16px}
-.modes{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+.xprev{display:flex;align-items:center;justify-content:center;border-radius:8px;height:110px;margin-top:6px;background:#6b7a8f;background-image:linear-gradient(180deg,#7d8ea3 0%,#4e5a6b 100%)}
+.inline{display:flex;gap:6px;margin-top:8px}
+.inline input{flex:1;min-width:0;background:var(--panel2);border:1px solid var(--line);color:var(--text);border-radius:7px;padding:8px 9px;font:inherit;font-size:13px}
+.msg{font-size:12.5px;margin-top:6px;line-height:1.45}
+.msg.ok{color:var(--good)} .msg.err{color:var(--bad)}
+.modes{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
 .mode{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:14px 14px 12px;cursor:pointer;text-align:left;color:var(--text);font:inherit;transition:border-color .15s,transform .15s}
 .mode:hover{border-color:var(--accent);transform:translateY(-2px)}
-.mode .t{font-family:Rajdhani;font-size:21px;font-weight:700;letter-spacing:.03em}
-.mode .d{font-size:13px;color:var(--muted);margin-top:4px;line-height:1.45;min-height:56px}
+.mode.featured{grid-column:1/-1;background:linear-gradient(120deg,rgba(245,165,36,.16),rgba(245,165,36,.03) 60%),var(--panel2);border-color:rgba(245,165,36,.45)}
+.mode .t{font-family:Rajdhani,Inter,sans-serif;font-size:21px;font-weight:700;letter-spacing:.03em}
+.mode .d{font-size:13px;color:var(--muted);margin-top:4px;line-height:1.45}
 .mode .b{margin-top:8px;font-size:12px;color:var(--accent)}
 .mode .tag{display:inline-block;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent2);margin-bottom:2px}
+.mode .new{display:inline-block;font-size:10px;letter-spacing:.1em;color:#111;background:var(--accent);border-radius:4px;padding:1px 5px;margin-left:6px;vertical-align:2px}
 table{width:100%;border-collapse:collapse;font-size:13px}
 th,td{text-align:left;padding:7px 6px;border-bottom:1px solid var(--line)}
 th{color:var(--muted);font-weight:500;font-size:11.5px;text-transform:uppercase;letter-spacing:.08em}
-.btn{background:var(--accent);color:#111;border:0;border-radius:9px;padding:11px 18px;font-weight:600;font:inherit;font-weight:600;cursor:pointer}
+.btn{background:var(--accent);color:#111;border:0;border-radius:9px;padding:11px 18px;font:inherit;font-weight:600;cursor:pointer}
+.btn.sm{padding:8px 12px;font-size:13px}
 .btn.ghost{background:transparent;color:var(--text);border:1px solid var(--line)}
 .btn:hover{filter:brightness(1.08)}
-.row{display:flex;gap:10px;flex-wrap:wrap}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
 .panel-center{width:min(640px,100%);text-align:center}
-.big{font-family:Rajdhani;font-size:76px;font-weight:700;color:var(--accent);line-height:1}
+.big{font-family:Rajdhani,Inter,sans-serif;font-size:76px;font-weight:700;color:var(--accent);line-height:1}
 .statgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin:18px 0}
-.statgrid div{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:10px}
+.statgrid>div{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:10px}
 .statgrid .k{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em}
-.statgrid .v{font-family:Rajdhani;font-size:26px;font-weight:700}
+.statgrid .v{font-family:Rajdhani,Inter,sans-serif;font-size:26px;font-weight:700}
 .pill{display:inline-block;padding:3px 10px;border-radius:99px;font-size:12px;border:1px solid var(--line);color:var(--muted)}
 .pill.ok{color:var(--good);border-color:rgba(61,255,138,.35)}
 .pill.warn{color:var(--accent);border-color:rgba(245,165,36,.35)}
 .best{color:var(--good);font-weight:600}
 .note{background:rgba(245,165,36,.08);border:1px solid rgba(245,165,36,.25);border-radius:10px;padding:10px 12px;font-size:13px;line-height:1.5;text-align:left;margin-top:12px}
-.right-col{display:flex;flex-direction:column;gap:18px}
+.chartwrap{position:relative}
+#chart{width:100%;height:230px;display:block}
+#chartTip{position:absolute;pointer-events:none;background:#0b0f16;border:1px solid var(--line);border-radius:8px;padding:6px 9px;font-size:12px;line-height:1.4;white-space:nowrap;transform:translate(-50%,-115%);display:none}
+#chartTip b{font-family:Rajdhani,Inter,sans-serif;font-size:16px}
 </style>
 </head>
 <body>
 <canvas id="game"></canvas>
-<canvas id="xhair" width="96" height="96"></canvas>
+<canvas id="xhair"></canvas>
 <svg id="hitmarker" viewBox="0 0 34 34"><g stroke="#fff" stroke-width="2.4" stroke-linecap="round"><line x1="5" y1="5" x2="12" y2="12"/><line x1="29" y1="5" x2="22" y2="12"/><line x1="5" y1="29" x2="12" y2="22"/><line x1="29" y1="29" x2="22" y2="22"/></g></svg>
 
 <div id="hud">
@@ -103,7 +128,9 @@ th{color:var(--muted);font-weight:500;font-size:11.5px;text-transform:uppercase;
   </div>
   <div id="hudFps">— fps</div>
   <div id="hudBottom"></div>
-  <div id="hudAmmo" class="hidden">30<small>/30</small></div>
+  <div id="hudAmmo" class="hidden"></div>
+  <div id="hudSpeed" class="hidden"><div class="v" id="hSpeed">0</div><div class="k">VELOCIDADE (u/s) · PRECISO ATÉ 73</div></div>
+  <div id="hudPrompt"></div>
 </div>
 <div id="countdown" class="hidden"></div>
 
@@ -117,40 +144,81 @@ th{color:var(--muted);font-weight:500;font-size:11.5px;text-transform:uppercase;
       </div>
       <div class="row">
         <span class="pill" id="rawBadge">Raw input: testado ao iniciar</span>
-        <button class="btn ghost" id="fsBtn">Tela cheia</button>
+        <button class="btn ghost sm hidden" id="installBtn">Instalar app</button>
+        <button class="btn ghost sm" id="fsBtn">Tela cheia</button>
       </div>
     </header>
     <div class="grid">
-      <div class="card">
-        <h3>Sua configuração</h3>
-        <div class="field"><label for="sSens">Sensibilidade (CS2)</label><input type="number" id="sSens" step="0.01" min="0.05" max="20"></div>
-        <div class="field"><label for="sDpi">DPI do mouse</label><input type="number" id="sDpi" step="50" min="100" max="32000"></div>
-        <button class="btn ghost" id="calOpenBtn" style="width:100%;padding:8px 12px;font-size:13px">Não sabe seu DPI? Medir agora</button>
-        <div class="derived">
-          <div><div class="k">eDPI</div><div class="v" id="dEdpi">—</div></div>
-          <div><div class="k">cm / 360°</div><div class="v" id="dCm">—</div></div>
+      <div class="col">
+        <div class="card">
+          <h3>Sua configuração</h3>
+          <div class="field"><label for="sSens">Sensibilidade (CS2)</label><input type="number" id="sSens" step="0.01" min="0.05" max="20"></div>
+          <div class="field"><label for="sDpi">DPI do mouse</label><input type="number" id="sDpi" step="50" min="100" max="32000"></div>
+          <button class="btn ghost sm" id="calOpenBtn" style="width:100%">Não sabe seu DPI? Medir agora</button>
+          <div class="derived">
+            <div><div class="k">eDPI</div><div class="v" id="dEdpi">—</div></div>
+            <div><div class="k">cm / 360°</div><div class="v" id="dCm">—</div></div>
+          </div>
+          <p class="hint">O giro aqui fica igual ao do CS2 se você usar a mesma sens e deixar o botão de DPI do mouse no mesmo estágio do jogo. O DPI só serve para calcular o cm/360.</p>
+
+          <h4>Jogo</h4>
+          <div class="field"><label for="sDur">Duração da rodada</label><select id="sDur"><option value="30">30 s</option><option value="60">60 s</option><option value="90">90 s</option></select></div>
+          <div class="field"><label for="sWarm">Duração do aquecimento</label><select id="sWarm"><option value="5">5 min</option><option value="10">10 min</option><option value="15">15 min</option></select></div>
+          <div class="field"><label for="sAspect">Proporção da tela</label><select id="sAspect"><option value="native">Nativa</option><option value="stretched">4:3 esticado</option><option value="black">4:3 com barras</option></select></div>
+          <div class="field"><label for="sVol">Volume</label><input type="range" id="sVol" min="0" max="1" step="0.05"></div>
+
+          <h4>Spray</h4>
+          <div class="field"><label for="sWeapon">Arma</label><select id="sWeapon"></select></div>
+          <div class="field"><label for="sPat">Mostrar padrão na parede</label><input type="checkbox" id="sPat"></div>
+          <div class="field"><label for="sPunch">Pulo da tela (aim punch)</label><input type="checkbox" id="sPunch"></div>
+
+          <h4>Avançado</h4>
+          <div class="field"><label for="sFac">Fator de correção do input</label><input type="number" id="sFac" step="0.01" min="0.1" max="5"></div>
+          <p class="hint">Deixe em 1. Mude só se girar 360° aqui exigir uma distância diferente da do CS no seu navegador.</p>
         </div>
-        <p class="hint">O giro aqui fica idêntico ao do CS2 se você usar a mesma sens e deixar o botão de DPI do mouse no mesmo estágio do jogo. Você nem precisa saber o número: ele só serve para calcular o cm/360.</p>
-        <div class="sep"></div>
-        <div class="field"><label for="sDur">Duração da rodada</label><select id="sDur"><option value="30">30 s</option><option value="60">60 s</option><option value="90">90 s</option></select></div>
-        <div class="field"><label for="sVol">Volume</label><input type="range" id="sVol" min="0" max="1" step="0.05"></div>
-        <div class="field"><label for="sPat">Mostrar padrão no spray</label><input type="checkbox" id="sPat"></div>
-        <div class="field"><label for="sFac">Fator de correção do input</label><input type="number" id="sFac" step="0.01" min="0.1" max="5"></div>
-        <p class="hint">Deixe em 1. Mude só se, no seu navegador, girar 360° aqui exigir uma distância diferente da do CS (por exemplo, por escala do Windows).</p>
-        <div class="sep"></div>
-        <h3>Crosshair</h3>
-        <div class="field"><label>Cor</label><div class="swatches" id="swatches"></div></div>
-        <div class="field"><label for="cSize">Tamanho</label><input type="range" id="cSize" min="1" max="14" step="1"></div>
-        <div class="field"><label for="cGap">Gap</label><input type="range" id="cGap" min="-2" max="10" step="1"></div>
-        <div class="field"><label for="cThick">Espessura</label><input type="range" id="cThick" min="1" max="5" step="1"></div>
-        <div class="field"><label for="cDot">Ponto central</label><input type="checkbox" id="cDot"></div>
-        <div class="xprev"><canvas id="xprev" width="96" height="96"></canvas></div>
+
+        <div class="card">
+          <h3>Crosshair</h3>
+          <div class="inline"><input type="text" id="xhCode" placeholder="Cole o código CSGO-xxxxx-…" spellcheck="false"><button class="btn sm" id="xhImport">Importar</button></div>
+          <div class="msg" id="xhMsg"></div>
+          <div class="field" style="margin-top:12px"><label>Cor</label><div class="swatches" id="swatches"></div></div>
+          <div class="field"><label for="xSize">Tamanho</label><div class="row" style="gap:6px"><input type="range" id="xSize" min="0" max="10" step="0.1"><span class="val" id="vSize"></span></div></div>
+          <div class="field"><label for="xGap">Gap</label><div class="row" style="gap:6px"><input type="range" id="xGap" min="-5" max="5" step="0.1"><span class="val" id="vGap"></span></div></div>
+          <div class="field"><label for="xThick">Espessura</label><div class="row" style="gap:6px"><input type="range" id="xThick" min="0" max="3" step="0.1"><span class="val" id="vThick"></span></div></div>
+          <div class="field"><label for="xAlpha">Opacidade</label><div class="row" style="gap:6px"><input type="range" id="xAlpha" min="20" max="255" step="1"><span class="val" id="vAlpha"></span></div></div>
+          <div class="field"><label for="xOutline">Contorno</label><input type="checkbox" id="xOutline"></div>
+          <div class="field"><label for="xDot">Ponto central</label><input type="checkbox" id="xDot"></div>
+          <div class="field"><label for="xT">Estilo T (sem a linha de cima)</label><input type="checkbox" id="xT"></div>
+          <div class="xprev"><canvas id="xprev" style="width:120px;height:110px"></canvas></div>
+          <p class="hint">Mesmos valores do CS2 (cl_crosshairsize, gap, thickness). A prévia mostra o tamanho em 1080p.</p>
+        </div>
+
+        <div class="card">
+          <h3>Conversor de sens</h3>
+          <div class="field"><label for="cvGame">Jogo</label><select id="cvGame"></select></div>
+          <div class="field"><label for="cvSens">Sens nesse jogo</label><input type="number" id="cvSens" step="0.01" min="0.01" value="0.4"></div>
+          <div class="derived" style="grid-template-columns:1fr">
+            <div><div class="k">Equivale no CS2 a</div><div class="v" id="cvOut">—</div></div>
+          </div>
+          <div class="row" style="justify-content:space-between">
+            <span class="hint" id="cvRev" style="margin:0"></span>
+            <button class="btn ghost sm" id="cvUse">Usar no app</button>
+          </div>
+        </div>
       </div>
-      <div class="right-col">
+
+      <div class="col">
         <div class="card">
           <h3>Modos de treino</h3>
           <div class="modes" id="modes"></div>
-          <p class="hint" style="margin-top:12px">Clique num modo para travar o mouse e começar. <b>Esc</b> pausa. Se o mouse não travar, abra a página numa aba própria ou em tela cheia. Funciona melhor no Chrome ou Edge, que suportam raw input.</p>
+          <p class="hint" style="margin-top:12px">Clique num modo para travar o mouse e começar. <b>Esc</b> pausa. Funciona melhor no Chrome ou Edge, que suportam raw input.</p>
+        </div>
+        <div class="card">
+          <div class="row" style="justify-content:space-between;margin-bottom:8px">
+            <h3 style="margin:0">Evolução</h3>
+            <div class="field" style="margin:0"><select id="chartSel" style="width:230px"></select></div>
+          </div>
+          <div class="chartwrap"><canvas id="chart"></canvas><div id="chartTip"></div></div>
         </div>
         <div class="card">
           <h3>Histórico</h3>
@@ -209,7 +277,7 @@ th{color:var(--muted);font-weight:500;font-size:11.5px;text-transform:uppercase;
 
 <!-- RESULTS -->
 <div id="results" class="overlay hidden">
-  <div class="card panel-center" style="width:min(760px,100%)">
+  <div class="card panel-center" style="width:min(780px,100%)">
     <div class="sub" id="rMode" style="text-transform:uppercase;letter-spacing:.14em">Modo</div>
     <div class="big" id="rScore">0</div>
     <div id="rBest" style="margin-top:6px"></div>
@@ -230,27 +298,76 @@ const $ = s => document.querySelector(s);
 const DEG = Math.PI/180;
 const M_YAW = 0.022;          // graus por count no CS2 (m_yaw / m_pitch)
 const CS_VFOV = 73.7398;      // FOV vertical do CS2 (90° horizontal em 4:3, Hor+)
+const EYE = 1.6;              // altura dos olhos (m)
+const U2M = 0.0254;           // 1 unidade do Source = 1 polegada
 const rand = (a,b) => a + Math.random()*(b-a);
-const wrap = a => { a = ((a+180)%360+360)%360-180; return a; };
+const wrap = a => ((a+180)%360+360)%360-180;
 const avg = arr => arr.length ? arr.reduce((s,x)=>s+x,0)/arr.length : 0;
+const pct = (a,b) => b ? (a/b*100) : 0;
+const esc = s => String(s).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 
 /* ---------- Persistência ---------- */
 function loadJSON(k,d){ try{ const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; }catch(e){ return d; } }
 function saveJSON(k,v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} }
-const DEFAULTS = {sens:1.25,dpi:800,factor:1,duration:60,chColor:'#3dff6e',chSize:5,chGap:2,chThick:2,chDot:false,volume:0.5,showPattern:true};
-const S = Object.assign({}, DEFAULTS, loadJSON('aimcs_settings', {}));
+const DEFAULTS = {sens:1.25,dpi:800,factor:1,duration:60,warmup:10,aspect:'native',volume:0.5,showPattern:true,aimPunch:true,weapon:'ak47',
+  cvGame:'valorant',
+  xh:{size:2.5,gap:-1.5,thick:1,outline:true,outlineThick:1,dot:false,tstyle:false,color:1,r:50,g:250,b:50,alpha:255,alphaEn:true}};
+const saved = loadJSON('aimcs_settings', {});
+const S = Object.assign({}, DEFAULTS, saved);
+S.xh = Object.assign({}, DEFAULTS.xh, saved.xh || {});
 let history = loadJSON('aimcs_history', []);
 const saveSettings = () => saveJSON('aimcs_settings', S);
 
+/* ---------- Armas (padrões aproximados) ---------- */
+function interpPattern(keys, n){
+  const rx = [], ry = [];
+  for(let i=0;i<n;i++){
+    let k = 0; while(k < keys.length-2 && keys[k+1][0] < i) k++;
+    const a = keys[k], b = keys[k+1];
+    const t = b[0]===a[0] ? 0 : Math.min(1, Math.max(0, (i-a[0])/(b[0]-a[0])));
+    rx.push(a[1]+(b[1]-a[1])*t); ry.push(a[2]+(b[2]-a[2])*t);
+  }
+  return {rx, ry};
+}
+const WEAPONS = {
+  ak47:{name:'AK-47', interval:100, mag:30,
+    rx:[0,0,0.05,-0.05,0.05,0,-0.1,0.1,0.25,0, -0.4,-0.9,-1.4,-1.8,-2.0,-1.8,-1.2,-0.5,0.3,1.0, 1.6,2.0,2.2,2.0,1.6,1.0,0.5,0.2,0.4,0.8],
+    ry:[0,0.3,0.75,1.35,2.05,2.8,3.5,4.1,4.6,5.0, 5.3,5.5,5.65,5.75,5.8,5.85,5.85,5.9,5.9,5.95, 5.95,6.0,6.0,6.05,6.05,6.1,6.1,6.1,6.15,6.15]},
+  m4a4:Object.assign({name:'M4A4', interval:90, mag:30}, interpPattern([[0,0,0],[1,0,0.3],[3,0.05,1.2],[6,0,2.5],[9,0.1,3.6],[11,0.5,4.1],[14,1.3,4.4],[17,0.6,4.6],[20,-0.8,4.7],[23,-1.4,4.8],[26,-0.6,4.85],[29,0.3,4.9]],30)),
+  m4a1s:Object.assign({name:'M4A1-S', interval:100, mag:20}, interpPattern([[0,0,0],[2,0,0.6],[5,-0.05,1.8],[8,0.1,2.8],[11,-0.4,3.3],[14,-0.9,3.5],[17,-0.4,3.6],[19,0.3,3.65]],20)),
+  galil:Object.assign({name:'Galil AR', interval:90, mag:35}, interpPattern([[0,0,0],[2,0,0.7],[5,0,2.2],[8,0.1,3.6],[10,-0.3,4.2],[13,-1.2,4.6],[16,-0.4,4.8],[19,0.9,4.9],[22,1.5,5.0],[25,0.6,5.05],[28,-0.6,5.1],[31,-0.2,5.15],[34,0.6,5.2]],35)),
+  famas:Object.assign({name:'FAMAS', interval:90, mag:25}, interpPattern([[0,0,0],[2,0,0.6],[5,0.05,2.0],[8,0.2,3.0],[10,0.7,3.4],[13,1.3,3.7],[16,0.5,3.9],[19,-0.6,4.0],[22,-1.1,4.05],[24,-0.6,4.1]],25))
+};
+const SPRAY_TIPS = {
+  ak47:'A AK sobe forte nas primeiras ~9 balas (puxe para baixo), depois vai para a esquerda (puxe para a direita) e por fim para a direita.',
+  m4a4:'A M4A4 sobe um pouco menos que a AK, desvia para a direita no meio do spray e depois volta para a esquerda.',
+  m4a1s:'A M4A1-S tem só 20 balas e recuo suave: puxe para baixo e corrija um leve desvio para a esquerda no final.',
+  galil:'A Galil tem 35 balas: sobe, vai para a esquerda, depois para a direita, e oscila no final.',
+  famas:'A FAMAS sobe e desvia para a direita no meio do spray, depois para a esquerda.'
+};
+
+/* ---------- Conversor ---------- */
+const GAMES = {
+  valorant:{name:'Valorant', yaw:0.07},
+  ow2:{name:'Overwatch 2', yaw:0.0066},
+  apex:{name:'Apex Legends', yaw:0.022},
+  cod:{name:'CoD MW / Warzone (hipfire)', yaw:0.0066},
+  source:{name:'TF2 / jogos Source', yaw:0.022}
+};
+
 /* ---------- Modos ---------- */
 const MODES = {
-  gridshot:{name:'Gridshot', tag:'Velocidade', desc:'Três alvos na parede ao mesmo tempo. Destrua o mais rápido possível, com cliques limpos.'},
-  flick:{name:'Flicks amplos', tag:'Flick', desc:'Um alvo por vez em ângulos de até 45°. Treina o movimento de braço e a parada precisa.'},
+  warmup:{name:'Aquecimento', tag:'Rotina', desc:'Antes de jogar: tracking, microflicks, flicks e spray em sequência, com um resumo no final. A duração muda nas configurações.', featured:true},
   micro:{name:'Microflicks de cabeça', tag:'Mais parecido com CS', desc:'Alvos pequenos, na altura da cabeça e perto da mira. É o ajuste fino que decide o duelo.'},
-  tracking:{name:'Tracking com strafe', tag:'Tracking', desc:'O alvo faz A-D com paradas bruscas, como um inimigo strafando. Mantenha a mira na cabeça.'},
-  spray:{name:'Spray da AK-47', tag:'Controle de recuo', desc:'Segure o clique e puxe o mouse para compensar o recuo. Mantenha os 30 tiros no círculo. O padrão é aproximado.'},
-  senstest:{name:'Teste de sensibilidade', tag:'Diagnóstico', desc:'Três blocos de microflick com sens 0.85×, 1× e 1.15× em ordem secreta. Descubra qual rende mais para você.'}
+  preaim:{name:'Pre-aim', tag:'Posicionamento', desc:'Inimigos dão peek nas quinas por menos de um segundo. Treina deixar a mira na altura da cabeça, onde ele vai aparecer.', isNew:true},
+  strafe:{name:'Counter-strafe', tag:'Movimento', desc:'Ande com WASD e pare com a tecla oposta antes de atirar. Tiro andando sai impreciso, como no CS.', isNew:true},
+  tracking:{name:'Tracking com strafe', tag:'Tracking', desc:'O bot faz A-D com paradas bruscas. Conta separado o tempo na cabeça e no corpo.'},
+  flick:{name:'Flicks amplos', tag:'Flick', desc:'Um alvo por vez em ângulos de até 45°. Treina o movimento de braço e a parada precisa.'},
+  gridshot:{name:'Gridshot', tag:'Velocidade', desc:'Três alvos na parede ao mesmo tempo. Destrua o mais rápido possível, com cliques limpos.'},
+  spray:{name:'Controle de spray', tag:'Recuo', desc:'AK-47, M4A4, M4A1-S, Galil ou FAMAS, com pulo de tela. Mantenha os tiros no círculo. Padrões aproximados.'},
+  senstest:{name:'Teste de sensibilidade', tag:'Diagnóstico', desc:'Três blocos de microflick com 0.85×, 1× e 1.15× da sua sens, em ordem secreta. Mostra qual rende mais.'}
 };
+const modeLabel = (m, v) => m==='spray' && v && WEAPONS[v] ? `Spray ${WEAPONS[v].name}` : (MODES[m] ? MODES[m].name : m);
 
 /* ---------- Three.js ---------- */
 const canvas = $('#game');
@@ -260,8 +377,16 @@ const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x0b0f16);
 const camera = new THREE.PerspectiveCamera(CS_VFOV, 1, 0.05, 500);
 camera.rotation.order = 'YXZ';
-function resize(){ renderer.setSize(innerWidth, innerHeight, false); camera.aspect = innerWidth/innerHeight; camera.updateProjectionMatrix(); }
-addEventListener('resize', resize); resize();
+let xhScaleX = 1;
+function applyAspect(){
+  const W = innerWidth, H = innerHeight; let cw = W, asp = W/H; xhScaleX = 1;
+  if(S.aspect === 'stretched'){ asp = 4/3; xhScaleX = (W/H)/(4/3); }
+  else if(S.aspect === 'black'){ cw = Math.min(W, Math.round(H*4/3)); asp = cw/H; }
+  canvas.style.width = cw+'px'; canvas.style.height = H+'px'; canvas.style.left = Math.round((W-cw)/2)+'px';
+  renderer.setSize(cw, H, false); camera.aspect = asp; camera.updateProjectionMatrix();
+  drawCrosshairs();
+}
+addEventListener('resize', applyAspect);
 
 function gridTex(base, line, major){
   const c = document.createElement('canvas'); c.width = c.height = 256; const g = c.getContext('2d');
@@ -270,7 +395,6 @@ function gridTex(base, line, major){
   g.strokeStyle = major; g.lineWidth = 4; g.strokeRect(0,0,256,256);
   const t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.anisotropy = renderer.capabilities.getMaxAnisotropy(); return t;
 }
-const EYE = 1.6;
 const wallTex = gridTex('#141a24','#1b2230','#222b3a'); wallTex.repeat.set(16,6);
 const room = new THREE.Mesh(new THREE.BoxGeometry(80,30,80), new THREE.MeshStandardMaterial({map:wallTex, side:THREE.BackSide, roughness:1}));
 room.position.y = -EYE + 15; scene.add(room);
@@ -281,19 +405,25 @@ scene.add(new THREE.HemisphereLight(0xd6e6ff, 0x1a1e26, 0.95));
 const dl = new THREE.DirectionalLight(0xffffff, 0.55); dl.position.set(6,12,8); scene.add(dl);
 
 const sphereGeo = new THREE.SphereGeometry(1, 32, 22);
+const bodyGeo = new THREE.CylinderGeometry(0.28, 0.24, 1.25, 20);
 const targetMat = new THREE.MeshStandardMaterial({color:0x2fd4ff, emissive:0x0a4d66, roughness:0.35, metalness:0.1});
-const onMat = new THREE.MeshStandardMaterial({color:0x3dff8a, emissive:0x0e6a33, roughness:0.35});
+const headOnMat = new THREE.MeshStandardMaterial({color:0x3dff8a, emissive:0x0e6a33, roughness:0.35});
+const bodyMat = new THREE.MeshStandardMaterial({color:0x4a566b, roughness:0.8});
+const bodyOnMat = new THREE.MeshStandardMaterial({color:0xf5c542, emissive:0x5a4300, roughness:0.6});
+const enemyHeadMat = new THREE.MeshStandardMaterial({color:0xff7a45, emissive:0x5a1d06, roughness:0.4});
+const enemyBodyMat = new THREE.MeshStandardMaterial({color:0x6b4a3a, roughness:0.85});
 
-/* Bot do tracking */
-const bot = {group:new THREE.Group(), x:0, dir:1, speed:3.4, next:0, stopUntil:0, r:0.4};
-const botHead = new THREE.Mesh(sphereGeo, targetMat); botHead.scale.setScalar(bot.r);
-const botBody = new THREE.Mesh(new THREE.CylinderGeometry(0.34,0.3,1.25,20), new THREE.MeshStandardMaterial({color:0x3a4558, roughness:0.8}));
-botBody.position.y = -1.0;
-bot.group.add(botHead, botBody); bot.group.visible = false; scene.add(bot.group);
+function makeBot(headMat, bMat){
+  const g = new THREE.Group();
+  const head = new THREE.Mesh(sphereGeo, headMat); head.scale.setScalar(0.22);
+  const body = new THREE.Mesh(bodyGeo, bMat); body.position.y = -0.92;
+  g.add(head, body); g.userData = {head, body}; g.visible = false; scene.add(g); return g;
+}
+const trackBot = makeBot(targetMat, bodyMat);
+const preBot = makeBot(enemyHeadMat, enemyBodyMat);
+const strafeBot = makeBot(enemyHeadMat, enemyBodyMat);
 
 /* Parede do spray */
-const AK_RX = [0,0,0.05,-0.05,0.05,0,-0.1,0.1,0.25,0, -0.4,-0.9,-1.4,-1.8,-2.0,-1.8,-1.2,-0.5,0.3,1.0, 1.6,2.0,2.2,2.0,1.6,1.0,0.5,0.2,0.4,0.8];
-const AK_RY = [0,0.3,0.75,1.35,2.05,2.8,3.5,4.1,4.6,5.0, 5.3,5.5,5.65,5.75,5.8,5.85,5.85,5.9,5.9,5.95, 5.95,6.0,6.0,6.05,6.05,6.1,6.1,6.1,6.15,6.15];
 const WALL_Z = -10, CIRCLE_R = 0.35;
 const sprayGroup = new THREE.Group(); sprayGroup.visible = false; scene.add(sprayGroup);
 const sprayWall = new THREE.Mesh(new THREE.PlaneGeometry(8,6), new THREE.MeshStandardMaterial({color:0x1f2632, roughness:0.95}));
@@ -305,31 +435,49 @@ circleRing.position.set(0,0,WALL_Z+0.012); sprayGroup.add(circleRing);
 const centerDot = new THREE.Mesh(new THREE.CircleGeometry(0.025,16), new THREE.MeshBasicMaterial({color:0xf5a524}));
 centerDot.position.set(0,0,WALL_Z+0.013); sprayGroup.add(centerDot);
 const patternGroup = new THREE.Group(); sprayGroup.add(patternGroup);
+const patGeo = new THREE.CircleGeometry(0.028,10);
+const patMat = new THREE.MeshBasicMaterial({color:0xf5a524, transparent:true, opacity:0.32, depthWrite:false});
 const decalGeo = new THREE.CircleGeometry(0.035,12);
 const decalIn = new THREE.MeshBasicMaterial({color:0xffffff, depthWrite:false});
 const decalOut = new THREE.MeshBasicMaterial({color:0xff5468, depthWrite:false});
 const decals = [];
-for(let i=0;i<30;i++){ const d = new THREE.Mesh(decalGeo, decalIn); d.visible=false; d.renderOrder=3; sprayGroup.add(d); decals.push(d); }
+for(let i=0;i<40;i++){ const d = new THREE.Mesh(decalGeo, decalIn); d.visible=false; d.renderOrder=3; sprayGroup.add(d); decals.push(d); }
 function wallHit(yawD, pitchD){
   const d = dirFromAngles(yawD, pitchD); if(d.z > -0.01) return null;
   const t = WALL_Z / d.z; return {x:d.x*t, y:d.y*t};
 }
-(function buildPattern(){
-  const m = new THREE.MeshBasicMaterial({color:0xf5a524, transparent:true, opacity:0.32, depthWrite:false});
-  const g = new THREE.CircleGeometry(0.028,10);
-  for(let i=0;i<30;i++){ const p = wallHit(-AK_RX[i], AK_RY[i]); const dm = new THREE.Mesh(g,m); dm.position.set(p.x,p.y,WALL_Z+0.014); patternGroup.add(dm); }
-})();
+function buildPattern(){
+  while(patternGroup.children.length) patternGroup.remove(patternGroup.children[0]);
+  const W = WEAPONS[S.weapon];
+  for(let i=0;i<W.mag;i++){ const p = wallHit(-W.rx[i], W.ry[i]); const dm = new THREE.Mesh(patGeo, patMat); dm.position.set(p.x,p.y,WALL_Z+0.014); patternGroup.add(dm); }
+}
 function clearDecals(){ decals.forEach(d=>d.visible=false); }
 
+/* Cenário do pre-aim */
+const preGroup = new THREE.Group(); preGroup.visible = false; scene.add(preGroup);
+const preWallGeo = new THREE.BoxGeometry(2.4, 3.2, 1.2);
+const preWallMat = new THREE.MeshStandardMaterial({color:0x2c3646, roughness:0.9});
+const preWallEdgeMat = new THREE.MeshStandardMaterial({color:0x394658, roughness:0.9});
+
 /* ---------- Matemática da mira ---------- */
+const eye = new THREE.Vector3();
 function dirFromAngles(yawD, pitchD){
   const y = yawD*DEG, p = pitchD*DEG;
   return new THREE.Vector3(-Math.sin(y)*Math.cos(p), Math.sin(p), -Math.cos(y)*Math.cos(p));
 }
+function aimDir(){ return dirFromAngles(yaw, pitch); }
+function angTo(pos){ const v = pos.clone().sub(eye); return {yaw: Math.atan2(-v.x, -v.z)/DEG, pitch: Math.atan2(v.y, Math.hypot(v.x, v.z))/DEG}; }
 function aimHitsSphere(dir, pos, r){
-  const d = pos.length(); const c = Math.min(1, dir.dot(pos)/d);
+  const v = pos.clone().sub(eye); const d = v.length(); const c = Math.min(1, dir.dot(v)/d);
   return Math.acos(c) <= Math.asin(Math.min(1, r/d));
 }
+const raycaster = new THREE.Raycaster();
+function rayFirst(dir, objs){
+  scene.updateMatrixWorld();
+  raycaster.set(eye, dir); const h = raycaster.intersectObjects(objs, false);
+  return h.length ? h[0].object : null;
+}
+function angleBetween(a, b){ return Math.acos(Math.min(1, Math.max(-1, a.dot(b)))) / DEG; }
 
 /* ---------- Áudio ---------- */
 let actx = null, noiseBuf = null;
@@ -350,6 +498,7 @@ function beep(freq, dur, type, vol){
   o.connect(g); g.connect(actx.destination); o.start(t); o.stop(t+dur+0.02);
 }
 function sndHit(){ beep(1046,0.07,'triangle',0.32); beep(1568,0.09,'sine',0.18); }
+function sndHead(){ beep(1318,0.06,'triangle',0.35); beep(2093,0.1,'sine',0.2); }
 function sndMiss(){ beep(160,0.05,'square',0.05); }
 function sndShot(){
   if(!actx || S.volume<=0) return;
@@ -358,16 +507,18 @@ function sndShot(){
 }
 
 /* ---------- Estado ---------- */
-let state = 'menu', resumeState = 'countdown', mode = null;
+let state = 'menu', resumeState = 'countdown', mode = null, run = null;
 let yaw = 0, pitch = 0, locked = false, rawInput = null, curMult = 1;
 let clock = 0, runEnd = 0, countdownEnd = 0, lastKill = 0;
 let stats = null, targets = [], effects = [];
-let blocks = null, blockIdx = 0, blockResults = [];
 let firing = false, sprayIdx = 0, lastShot = -1e9, nextShot = 0, curSpray = null;
+const punch = {x:0, y:0};
+let promptText = '', promptColor = '', promptUntil = 0;
 const SENSTEST_BLOCK = 20;
 
-function newStats(){ return {shots:0,hits:0,kills:0,ttks:[],over:0,under:0,onT:0,total:0,sprays:[]}; }
-function blockDuration(){ return mode==='senstest' ? SENSTEST_BLOCK : S.duration; }
+function newStats(){ return {shots:0,hits:0,kills:0,heads:0,bodies:0,escaped:0,ttks:[],over:0,under:0,
+  headT:0,bodyT:0,total:0,sprays:[],still:0,stopTimes:[],placeErr:[],vertErr:[],reaction:[],points:0}; }
+const curBlock = () => run.plan[run.idx];
 
 /* ---------- Pointer lock ---------- */
 function requestLock(){
@@ -400,7 +551,7 @@ document.addEventListener('pointerlockchange', ()=>{
   if(locked){
     if(state==='paused' || state==='waitlock'){ state = resumeState; $('#pause').classList.add('hidden'); }
   } else {
-    firing = false;
+    firing = false; clearKeys();
     if(state==='playing' || state==='countdown'){
       resumeState = state; state = 'paused';
       $('#pauseTitle').textContent = 'Pausado';
@@ -412,6 +563,12 @@ document.addEventListener('pointerlockchange', ()=>{
 document.addEventListener('pointerlockerror', lockFail);
 
 /* ---------- Input ---------- */
+const keys = {};
+function clearKeys(){ for(const k in keys) keys[k] = false; }
+document.addEventListener('keydown', e=>{ keys[e.code] = true; });
+document.addEventListener('keyup', e=>{ keys[e.code] = false; });
+addEventListener('blur', clearKeys);
+
 document.addEventListener('mousemove', e=>{
   if(!locked) return;
   if(calib.open){
@@ -430,6 +587,8 @@ document.addEventListener('mousedown', e=>{
   }
   if(!locked || e.button !== 0 || state !== 'playing') return;
   if(mode === 'spray') startSpray();
+  else if(mode === 'preaim') shootPreaim();
+  else if(mode === 'strafe') shootStrafe();
   else if(mode !== 'tracking') shoot();
 });
 document.addEventListener('mouseup', e=>{
@@ -469,7 +628,7 @@ function renderCal(){
   if(n >= 1){
     const vals = calib.samples.map(sampleDpi), mean = avg(vals);
     const spread = n > 1 ? (Math.max(...vals) - Math.min(...vals)) / mean : 0;
-    let snap = COMMON_DPI.reduce((a,b)=> Math.abs(b-mean) < Math.abs(a-mean) ? b : a);
+    const snap = COMMON_DPI.reduce((a,b)=> Math.abs(b-mean) < Math.abs(a-mean) ? b : a);
     const close = Math.abs(snap-mean)/mean <= 0.08;
     const useVal = close ? snap : Math.round(mean/50)*50;
     if(n >= 3){
@@ -477,16 +636,16 @@ function renderCal(){
       html += close ? `Isso bate com o valor de fábrica comum de <b>${snap} DPI</b>, que deve ser o estágio em que o seu mouse está agora.` : `Não ficou perto de um valor comum de fábrica. Use a média arredondada, <b>${useVal}</b>.`;
       if(spread > 0.1) html += ` <br><span style="color:var(--bad)">As medições variaram ${Math.round(spread*100)}%.</span> Vale recomeçar, arrastando mais reto e parando exatamente no fim da referência.`;
       html += `<br><br>Se você apertar o botão de DPI do mouse, o valor muda. Lembre de deixar no mesmo estágio que você usa no CS.</div>`;
-      html += `<div class="row" style="margin-top:12px"><button class="btn" id="calUseBtn">Usar ${useVal} DPI</button></div>`;
+      html += `<div class="row" style="margin-top:12px"><button class="btn" id="calUseBtn" data-v="${useVal}">Usar ${useVal} DPI</button></div>`;
     }
     if(rawInput === false) html += `<div class="note" style="margin-top:10px">Seu navegador não liberou o raw input. A velocidade do ponteiro do Windows e a opção "Aumentar precisão do ponteiro" podem distorcer a medição. No Chrome ou no Edge ela fica exata.</div>`;
   }
   $('#calResult').innerHTML = html;
   const ub = $('#calUseBtn');
-  if(ub){ const v = parseInt(ub.textContent.replace(/\D/g,''),10); ub.addEventListener('click', ()=>{ S.dpi = v; $('#sDpi').value = v; saveSettings(); updateDerived(); closeCal(); }); }
+  if(ub) ub.addEventListener('click', ()=>{ const v = parseInt(ub.dataset.v,10); S.dpi = v; $('#sDpi').value = v; saveSettings(); updateDerived(); closeCal(); });
 }
 
-/* ---------- Alvos ---------- */
+/* ---------- Alvos (gridshot / flick / micro) ---------- */
 function makeTarget(yD, pD, dist, r, extra){
   const pos = dirFromAngles(yD, pD).multiplyScalar(dist);
   const m = new THREE.Mesh(sphereGeo, targetMat); m.scale.setScalar(0.001); m.position.copy(pos); scene.add(m);
@@ -510,7 +669,7 @@ function spawnFlick(){
   makeTarget(y, p, 16, 0.48);
 }
 function spawnMicro(){
-  const wy = wrap(yaw); const off = rand(2.5, 12); let s = Math.random()<0.5 ? -1 : 1;
+  const wy = wrap(yaw); const off = rand(2.5, 12); const s = Math.random()<0.5 ? -1 : 1;
   let y = wy + s*off; if(Math.abs(y) > 35) y = wy - s*off;
   makeTarget(y, rand(-1.4, 2.0), rand(14,22), 0.2);
 }
@@ -519,20 +678,17 @@ function spawnNext(exclude){
   else if(mode==='flick') spawnFlick();
   else spawnMicro();
 }
-function spawnInitial(){
-  if(mode==='gridshot'){ spawnGrid(); spawnGrid(); spawnGrid(); }
-  else if(mode==='flick' || mode==='micro' || mode==='senstest') spawnNext();
-}
 
 function hitFx(pos, r){
   const m = new THREE.Mesh(sphereGeo, new THREE.MeshBasicMaterial({color:0x9ff0ff, transparent:true, opacity:0.6, depthWrite:false}));
   m.position.copy(pos); m.scale.setScalar(r); scene.add(m); effects.push({m, r, t:0});
 }
-function flashHitmarker(){ const h = $('#hitmarker'); h.classList.remove('show'); void h.getBoundingClientRect(); h.classList.add('show'); }
+function flashHitmarker(head){ const h = $('#hitmarker'); h.classList.remove('show'); h.classList.toggle('head', !!head); void h.getBoundingClientRect(); h.classList.add('show'); }
+function flashPrompt(text, color, ms){ promptText = text; promptColor = color; promptUntil = clock + ms; }
 
 function shoot(){
   stats.shots++;
-  const d = dirFromAngles(yaw, pitch);
+  const d = aimDir();
   let hit = null;
   for(const t of targets){ if(aimHitsSphere(d, t.pos, t.r)){ hit = t; break; } }
   if(hit){
@@ -554,16 +710,19 @@ function shoot(){
 }
 
 /* ---------- Spray ---------- */
+function weapon(){ return WEAPONS[S.weapon] || WEAPONS.ak47; }
 function startSpray(){
-  if(sprayIdx >= 30 && clock - lastShot <= 350) return;
+  const W = weapon();
+  if(sprayIdx >= W.mag && clock - lastShot <= 350) return;
   if(!curSpray){ clearDecals(); curSpray = {shots:0, inC:0}; sprayIdx = 0; }
-  firing = true; nextShot = Math.max(clock, lastShot + 100);
+  firing = true; nextShot = Math.max(clock, lastShot + W.interval);
 }
 function fireBullet(){
-  const i = sprayIdx++;
-  const by = yaw - AK_RX[i] + (Math.random()-0.5)*0.12;
-  const bp = pitch + AK_RY[i] + (Math.random()-0.5)*0.12;
+  const W = weapon(); const i = sprayIdx++;
+  const by = yaw - W.rx[i] + (Math.random()-0.5)*0.12;
+  const bp = pitch + W.ry[i] + (Math.random()-0.5)*0.12;
   stats.shots++; curSpray.shots++; sndShot();
+  if(S.aimPunch){ punch.x = W.rx[i]*0.225; punch.y = W.ry[i]*0.225; }
   const p = wallHit(by, bp);
   if(p && Math.abs(p.x) < 4 && p.y > -2.5 && p.y < 3.5){
     const inC = Math.hypot(p.x, p.y) <= CIRCLE_R;
@@ -576,14 +735,16 @@ function finalizeSpray(){
   curSpray = null; sprayIdx = 0;
 }
 function updateSpray(){
+  const W = weapon();
   if(firing){
-    while(clock >= nextShot && sprayIdx < 30){ fireBullet(); lastShot = nextShot; nextShot += 100; }
-    if(sprayIdx >= 30) firing = false;
+    while(clock >= nextShot && sprayIdx < W.mag){ fireBullet(); lastShot = nextShot; nextShot += W.interval; }
+    if(sprayIdx >= W.mag) firing = false;
   } else if(curSpray && clock - lastShot > 350){ finalizeSpray(); }
 }
 
-/* ---------- Tracking ---------- */
-function updateBot(dt){
+/* ---------- Tracking (cabeça e corpo) ---------- */
+const bot = {x:0, dir:1, speed:4.0, next:0, stopUntil:0};
+function updateTracking(dt){
   if(clock >= bot.next){
     if(Math.random() < 0.25) bot.stopUntil = clock + rand(120, 320);
     if(Math.random() < 0.8) bot.dir = -bot.dir;
@@ -592,57 +753,215 @@ function updateBot(dt){
   const v = clock < bot.stopUntil ? 0 : bot.dir * bot.speed;
   bot.x += v*dt;
   if(bot.x > 5){ bot.x = 5; bot.dir = -1; } else if(bot.x < -5){ bot.x = -5; bot.dir = 1; }
-  bot.group.position.set(bot.x, 0, -12);
-  const on = aimHitsSphere(dirFromAngles(yaw,pitch), bot.group.position, bot.r);
-  stats.total += dt; if(on) stats.onT += dt;
-  botHead.material = on ? onMat : targetMat;
+  trackBot.position.set(bot.x, 0, -12);
+  const {head, body} = trackBot.userData;
+  const obj = rayFirst(aimDir(), [head, body]);
+  stats.total += dt;
+  if(obj === head) stats.headT += dt; else if(obj === body) stats.bodyT += dt;
+  head.material = obj === head ? headOnMat : targetMat;
+  body.material = obj === body ? bodyOnMat : bodyMat;
 }
 
-/* ---------- Fluxo da rodada ---------- */
-function startMode(m){
-  mode = m; ensureAudio();
+/* ---------- Pre-aim ---------- */
+const pre = {walls:[], last:-1, phase:'wait', t0:0, start:0, wall:null, measured:false, appearAt:0};
+const PEEK_OUT = 110, PEEK_HOLD = 650, PEEK_IN = 110, OFF_HIDDEN = -0.75, OFF_SHOWN = 0.45;
+function buildPreaim(){
+  while(preGroup.children.length) preGroup.remove(preGroup.children[0]);
+  pre.walls = [];
+  const n = 6, span = 120;
+  for(let i=0;i<n;i++){
+    const yw = -span/2 + (i+0.5)*span/n + rand(-3,3);
+    const d = rand(8, 17);
+    const side = Math.random() < 0.5 ? -1 : 1;
+    const f = dirFromAngles(yw, 0); const c = f.clone().multiplyScalar(d);
+    const mesh = new THREE.Mesh(preWallGeo, i%2 ? preWallMat : preWallEdgeMat);
+    mesh.position.set(c.x, -EYE + 1.6, c.z); mesh.rotation.y = yw*DEG; preGroup.add(mesh);
+    const right = new THREE.Vector3(Math.cos(yw*DEG), 0, -Math.sin(yw*DEG));
+    pre.walls.push({mesh, c, f, right, side, d, yaw:yw});
+  }
+  pre.last = -1; pre.phase = 'wait'; pre.t0 = clock + 800; preBot.visible = false;
+}
+function preBotPos(w, off){
+  return w.c.clone().add(w.right.clone().multiplyScalar(w.side*(1.2+off))).add(w.f.clone().multiplyScalar(0.3)).setY(0.02);
+}
+function updatePreaim(){
+  if(pre.phase === 'wait'){
+    if(clock < pre.t0) return;
+    let i; do{ i = Math.floor(Math.random()*pre.walls.length); }while(i === pre.last && pre.walls.length > 1);
+    pre.last = i; pre.wall = pre.walls[i]; pre.phase = 'out'; pre.start = clock; pre.measured = false;
+    pre.appearAt = clock + PEEK_OUT/2;
+    preBot.visible = true;
+  }
+  const w = pre.wall; let off;
+  if(pre.phase === 'out'){
+    const k = Math.min(1, (clock-pre.start)/PEEK_OUT); off = OFF_HIDDEN + (OFF_SHOWN-OFF_HIDDEN)*k;
+    if(k >= 1){ pre.phase = 'hold'; pre.start = clock; }
+  } else if(pre.phase === 'hold'){
+    off = OFF_SHOWN; if(clock - pre.start >= PEEK_HOLD){ pre.phase = 'in'; pre.start = clock; }
+  } else if(pre.phase === 'in'){
+    const k = Math.min(1, (clock-pre.start)/PEEK_IN); off = OFF_SHOWN + (OFF_HIDDEN-OFF_SHOWN)*k;
+    if(k >= 1){ stats.escaped++; preBot.visible = false; pre.phase = 'wait'; pre.t0 = clock + rand(500,1300); flashPrompt('Escapou', '#ff5468', 500); return; }
+  }
+  preBot.position.copy(preBotPos(w, off));
+  if(!pre.measured && clock >= pre.appearAt){
+    pre.measured = true;
+    const headFinal = preBotPos(w, OFF_SHOWN);
+    const a = angTo(headFinal);
+    stats.placeErr.push(angleBetween(aimDir(), headFinal.clone().sub(eye).normalize()));
+    stats.vertErr.push(Math.abs(pitch - a.pitch));
+  }
+}
+function shootPreaim(){
+  stats.shots++;
+  if(!preBot.visible){ sndMiss(); return; }
+  const {head, body} = preBot.userData;
+  const obj = rayFirst(aimDir(), pre.walls.map(w=>w.mesh).concat([head, body]));
+  if(obj === head || obj === body){
+    const isHead = obj === head;
+    const rt = Math.max(0, clock - pre.appearAt);
+    stats.hits++; stats.kills++; stats.reaction.push(rt);
+    if(isHead){ stats.heads++; stats.points += 100 + Math.round(Math.max(0, 600 - rt)/6); sndHead(); }
+    else { stats.bodies++; stats.points += 40; sndHit(); }
+    flashHitmarker(isHead); hitFx(head.getWorldPosition(new THREE.Vector3()), 0.22);
+    preBot.visible = false; pre.phase = 'wait'; pre.t0 = clock + rand(500,1300);
+  } else sndMiss();
+}
+
+/* ---------- Counter-strafe (física do Source) ---------- */
+const MAXSPEED = 215, ACCURATE = 0.34*MAXSPEED, ACCEL = 5.5, FRICTION = 5.2, STOPSPEED = 80;
+const mv = {vx:0, vz:0, speed:0, armed:false, brakeStart:null, t:0};
+const strafe = {target:false};
+const SUBSTEP = 1/240;
+let moveAcc = 0;
+function updateMovement(dt){
+  moveAcc += dt;
+  while(moveAcc >= SUBSTEP){ stepMovement(SUBSTEP); moveAcc -= SUBSTEP; }
+}
+function stepMovement(dt){
+  mv.t += dt*1000;
+  let sp = Math.hypot(mv.vx, mv.vz);
+  if(sp > 0){ const drop = Math.max(sp, STOPSPEED)*FRICTION*dt; const ns = Math.max(0, sp-drop); mv.vx *= ns/sp; mv.vz *= ns/sp; }
+  const y = yaw*DEG; const fwd = {x:-Math.sin(y), z:-Math.cos(y)}, rt = {x:Math.cos(y), z:-Math.sin(y)};
+  let fx = 0, fz = 0;
+  if(keys.KeyW){ fx += fwd.x; fz += fwd.z; } if(keys.KeyS){ fx -= fwd.x; fz -= fwd.z; }
+  if(keys.KeyD){ fx += rt.x; fz += rt.z; }  if(keys.KeyA){ fx -= rt.x; fz -= rt.z; }
+  const L = Math.hypot(fx, fz);
+  if(L > 0){
+    fx /= L; fz /= L;
+    const cur = mv.vx*fx + mv.vz*fz, add = MAXSPEED - cur;
+    if(add > 0){ const a = Math.min(ACCEL*dt*MAXSPEED, add); mv.vx += a*fx; mv.vz += a*fz; }
+  }
+  eye.x += mv.vx*U2M*dt; eye.z += mv.vz*U2M*dt;
+  if(eye.x > 5){ eye.x = 5; mv.vx = 0; } else if(eye.x < -5){ eye.x = -5; mv.vx = 0; }
+  if(eye.z > 3){ eye.z = 3; mv.vz = 0; } else if(eye.z < -3){ eye.z = -3; mv.vz = 0; }
+  sp = Math.hypot(mv.vx, mv.vz); mv.speed = sp;
+  // tempo de parada: de 90% da velocidade máxima até ficar preciso
+  if(sp >= 0.9*MAXSPEED){ mv.armed = true; mv.brakeStart = null; }
+  else if(mv.armed){
+    if(mv.brakeStart === null) mv.brakeStart = mv.t;
+    if(sp <= ACCURATE){ if(state === 'playing') stats.stopTimes.push(mv.t - mv.brakeStart); mv.armed = false; mv.brakeStart = null; }
+  }
+}
+function updateStrafe(dt){
+  updateMovement(dt);
+  if(!strafe.target && mv.speed > 150){
+    const y = rand(-22, 22), d = rand(14, 20);
+    const p = dirFromAngles(y, 0).multiplyScalar(d); strafeBot.position.set(p.x, 0.02, p.z);
+    strafeBot.visible = true; strafe.target = true; strafe.born = clock;
+  }
+}
+function shootStrafe(){
+  stats.shots++; sndShot();
+  const sp = mv.speed, accurate = sp <= ACCURATE;
+  if(accurate) stats.still++; else flashPrompt('ATIROU ANDANDO', '#ff5468', 600);
+  const spread = accurate ? 0.08 : 1.2 + sp/MAXSPEED*5;
+  const ang = Math.random()*Math.PI*2, r = Math.sqrt(Math.random())*spread;
+  const dir = dirFromAngles(yaw + Math.cos(ang)*r, pitch + Math.sin(ang)*r);
+  if(!strafe.target) return;
+  const {head, body} = strafeBot.userData;
+  const obj = rayFirst(dir, [head, body]);
+  if(obj){
+    const isHead = obj === head;
+    stats.hits++; stats.kills++; if(isHead) stats.heads++;
+    stats.ttks.push(clock - strafe.born);
+    isHead ? sndHead() : sndHit(); flashHitmarker(isHead);
+    hitFx(head.getWorldPosition(new THREE.Vector3()), 0.22);
+    strafeBot.visible = false; strafe.target = false;
+  }
+}
+
+/* ---------- Fluxo ---------- */
+function startRun(kind){
+  ensureAudio();
+  let plan;
+  if(kind === 'senstest') plan = [0.85,1,1.15].sort(()=>Math.random()-0.5).map((m,i)=>({mode:'micro', dur:SENSTEST_BLOCK, mult:m, label:`Bloco ${i+1} de 3`}));
+  else if(kind === 'warmup'){
+    const f = S.warmup/10;
+    plan = [['tracking',120],['micro',180],['flick',120],['spray',180]].map(([m,s],i)=>({mode:m, dur:Math.round(s*f), mult:1, label:`Etapa ${i+1} de 4 · ${modeLabel(m, m==='spray'?S.weapon:null)}`}));
+  } else plan = [{mode:kind, dur:S.duration, mult:1}];
+  run = {kind, plan, idx:0, results:[]};
   ['#menu','#results','#pause'].forEach(s=>$(s).classList.add('hidden'));
   yaw = 0; pitch = 0; clock = 0;
-  if(m === 'senstest'){ blocks = [0.85,1,1.15].sort(()=>Math.random()-0.5); blockIdx = 0; blockResults = []; }
-  else blocks = null;
   beginBlock();
   $('#hud').style.display = 'block'; $('#xhair').style.display = 'block';
   state = 'waitlock'; resumeState = 'countdown';
   requestLock();
 }
+function setSceneFor(m){
+  sprayGroup.visible = m === 'spray';
+  trackBot.visible = m === 'tracking';
+  preGroup.visible = m === 'preaim';
+  preBot.visible = false; strafeBot.visible = false;
+  $('#hudAmmo').classList.toggle('hidden', m !== 'spray');
+  $('#hudSpeed').classList.toggle('hidden', m !== 'strafe');
+}
 function beginBlock(){
+  const b = curBlock(); mode = b.mode; curMult = b.mult;
   stats = newStats(); clearTargets(); clearDecals();
-  curMult = blocks ? blocks[blockIdx] : 1;
-  firing = false; sprayIdx = 0; lastShot = -1e9; curSpray = null;
+  firing = false; sprayIdx = 0; lastShot = -1e9; curSpray = null; punch.x = punch.y = 0;
   bot.x = 0; bot.dir = 1; bot.next = 0; bot.stopUntil = 0;
-  sprayGroup.visible = mode === 'spray';
-  patternGroup.visible = S.showPattern;
-  bot.group.visible = mode === 'tracking';
-  $('#hudAmmo').classList.toggle('hidden', mode !== 'spray');
-  countdownEnd = clock + (blocks && blockIdx > 0 ? 2500 : 3000);
-  const bl = blocks ? ` · Bloco <b>${blockIdx+1}/3</b> (sens oculta)` : ` · Sens <b>${S.sens}</b>`;
-  $('#hudBottom').innerHTML = `<b>${MODES[mode].name}</b>${bl} · Esc para pausar`;
-  $('#hScoreK').textContent = mode==='tracking' ? 'Na mira' : mode==='spray' ? 'No círculo' : 'Abates';
-  $('#hAccK').textContent = mode==='tracking' ? 'Duração' : 'Precisão';
+  eye.set(0,0,0); mv.vx = mv.vz = mv.speed = 0; mv.armed = false; mv.brakeStart = null; moveAcc = 0; strafe.target = false;
+  setSceneFor(mode);
+  if(mode === 'spray'){ buildPattern(); patternGroup.visible = S.showPattern; }
+  if(mode === 'preaim') buildPreaim();
+  countdownEnd = clock + (run.idx > 0 ? 3000 : 3000);
+  let info;
+  if(run.kind === 'senstest') info = ` · ${b.label} (sens oculta)`;
+  else if(run.kind === 'warmup') info = ` · Aquecimento ${run.idx+1}/${run.plan.length}`;
+  else info = ` · Sens <b>${S.sens}</b>`;
+  const extra = mode==='strafe' ? ' · <b>WASD</b> para andar' : '';
+  $('#hudBottom').innerHTML = `<b>${modeLabel(mode, mode==='spray'?S.weapon:null)}</b>${info}${extra} · Esc para pausar`;
+  const K = {tracking:['Na cabeça','No corpo'], spray:['No círculo','Média spray'], preaim:['Pontos','Headshots'], strafe:['Abates','Tiros parados']}[mode] || ['Abates','Precisão'];
+  $('#hScoreK').textContent = K[0]; $('#hAccK').textContent = K[1];
+}
+function startPlaying(){
+  state = 'playing'; runEnd = clock + curBlock().dur*1000; lastKill = clock;
+  if(mode==='gridshot'){ spawnGrid(); spawnGrid(); spawnGrid(); }
+  else if(mode==='flick' || mode==='micro') spawnNext();
+  if(mode==='preaim'){ pre.t0 = clock + 700; }
 }
 function endBlock(){
   firing = false;
   if(mode === 'spray') finalizeSpray();
   clearTargets();
-  if(blocks){
-    blockResults.push(Object.assign({mult:curMult}, summarize()));
-    blockIdx++;
-    if(blockIdx < blocks.length){ beginBlock(); state = 'countdown'; return; }
-  }
+  const sum = summarize();
+  const b = curBlock();
+  const variant = mode === 'spray' ? S.weapon : '';
+  const prev = bestFor(mode, variant);
+  run.results.push(Object.assign({mode, variant, mult:b.mult, prevBest:prev}, sum));
+  if(run.kind !== 'senstest') pushHistory(mode, variant, sum.score, sum.display);
+  run.idx++;
+  if(run.idx < run.plan.length){ beginBlock(); state = 'countdown'; return; }
   finishRun();
 }
 function summarize(){
   const acc = stats.shots ? stats.hits/stats.shots : 0;
   const ttk = avg(stats.ttks);
   if(mode === 'tracking'){
-    const pct = stats.total ? stats.onT/stats.total : 0;
-    return {score: Math.round(pct*1000)/10, display: (pct*100).toFixed(1)+'%', lines:[
-      ['Tempo na mira', (pct*100).toFixed(1)+'%'], ['Segundos na mira', stats.onT.toFixed(1)+' s'], ['Duração', Math.round(stats.total)+' s']]};
+    const h = pct(stats.headT, stats.total), bd = pct(stats.bodyT, stats.total);
+    const score = Math.round((h + 0.4*bd)*10)/10;
+    return {score, display: score.toFixed(1)+' pts', head:h, body:bd, lines:[
+      ['Na cabeça', h.toFixed(1)+'%'], ['No corpo', bd.toFixed(1)+'%'], ['Fora do alvo', Math.max(0,100-h-bd).toFixed(1)+'%'], ['Pontuação', score.toFixed(1)]]};
   }
   if(mode === 'spray'){
     const sp = avg(stats.sprays);
@@ -651,42 +970,86 @@ function summarize(){
       ['Média por spray', (sp*100).toFixed(1)+'%'], ['Melhor spray', (best*100).toFixed(0)+'%'],
       ['Sprays (10+ tiros)', stats.sprays.length], ['Tiros no círculo', stats.hits+' / '+stats.shots]]};
   }
+  if(mode === 'preaim'){
+    const rt = avg(stats.reaction), pe = avg(stats.placeErr), ve = avg(stats.vertErr);
+    const seen = stats.kills + stats.escaped;
+    return {score: stats.points, display: stats.points.toLocaleString('pt-BR'), placeErr:pe, vertErr:ve, lines:[
+      ['Headshots', `${stats.heads} / ${seen}`], ['Só corpo', stats.bodies], ['Escaparam', stats.escaped],
+      ['Reação média', rt ? Math.round(rt)+' ms' : '—'], ['Erro da mira ao aparecer', pe ? pe.toFixed(1)+'°' : '—'], ['Erro vertical', ve ? ve.toFixed(1)+'°' : '—']]};
+  }
+  if(mode === 'strafe'){
+    const still = stats.shots ? stats.still/stats.shots : 0;
+    const stop = avg(stats.stopTimes);
+    const score = Math.round(stats.kills*100*(0.5 + 0.5*still));
+    return {score, display: score.toLocaleString('pt-BR'), still, stop, lines:[
+      ['Abates', stats.kills], ['Headshots', stats.heads], ['Tiros parados', (still*100).toFixed(0)+'%'],
+      ['Precisão', (acc*100).toFixed(0)+'%'], ['Tempo médio de parada', stop ? Math.round(stop)+' ms' : '—'], ['Tempo por abate', ttk ? Math.round(ttk)+' ms' : '—']]};
+  }
   const score = Math.round(stats.kills*100*acc);
   return {score, display: score.toLocaleString('pt-BR'), acc, ttk, over:stats.over, under:stats.under, kills:stats.kills, lines:[
     ['Abates', stats.kills], ['Precisão', (acc*100).toFixed(1)+'%'],
     ['Tempo médio/alvo', ttk ? Math.round(ttk)+' ms' : '—'], ['Overflick / Underflick', stats.over+' / '+stats.under]]};
 }
+function tipFor(r){
+  if(r.over !== undefined && r.over + r.under >= 5){
+    return r.over > r.under*1.5 ? 'Você passa do alvo com frequência (overflick). Pode ser sens alta ou braço rápido demais no fim do movimento.'
+      : r.under > r.over*1.5 ? 'Você para antes do alvo com frequência (underflick). Pode ser sens baixa ou falta de confiança no movimento.'
+      : 'Overflicks e underflicks estão equilibrados, sem tendência clara.';
+  }
+  if(r.mode === 'spray') return 'Os tiros brancos caíram dentro do círculo; os vermelhos, fora. ' + (SPRAY_TIPS[r.variant]||'') + ' Os padrões são aproximações do jogo.';
+  if(r.mode === 'preaim'){
+    let t = 'O "erro da mira ao aparecer" mede a distância entre sua mira e a cabeça no instante em que o inimigo surge. Quanto menor, menos você precisa mexer o mouse para matar.';
+    if(r.vertErr > 2) t += ' Seu erro vertical está alto: deixe a mira na altura da cabeça enquanto troca de ângulo.';
+    return t;
+  }
+  if(r.mode === 'strafe'){
+    let t = 'Sem counter-strafe, só soltando a tecla, a parada leva cerca de 190 ms. Com a tecla oposta, fica perto de 70–100 ms.';
+    if(r.stop) t += r.stop <= 110 ? ' Seu tempo de parada está bom: você está fazendo counter-strafe.' : ' Seu tempo de parada está alto: toque a tecla oposta (D depois de A, e vice-versa) logo antes de atirar.';
+    if(r.still < 0.8) t += ' Muitos tiros saíram andando: espere a velocidade ficar verde antes de clicar.';
+    return t;
+  }
+  if(r.mode === 'tracking') return 'Mire na cabeça: o tempo no corpo vale 40% na pontuação. Acompanhe as paradas bruscas sem passar do alvo.';
+  return '';
+}
+function bestBadge(r){
+  return r.prevBest === null ? '<span class="pill ok">Primeiro resultado neste modo</span>'
+    : r.score > r.prevBest.score ? `<span class="pill ok">Novo recorde! Anterior: ${esc(r.prevBest.display)}</span>`
+    : `<span class="pill">Recorde: ${esc(r.prevBest.display)}</span>`;
+}
 function finishRun(){
   state = 'results';
   try{ document.exitPointerLock(); }catch(e){}
   $('#hud').style.display = 'none'; $('#xhair').style.display = 'none'; $('#countdown').classList.add('hidden');
-  sprayGroup.visible = false; bot.group.visible = false; clearTargets();
-  const R = $('#results'); R.classList.remove('hidden');
-  $('#rMode').textContent = MODES[mode].name;
-  $('#rExtra').innerHTML = '';
-  if(mode === 'senstest'){ renderSensResults(); return; }
-  const sum = summarize();
-  $('#rScore').textContent = sum.display;
-  $('#rStats').innerHTML = sum.lines.map(([k,v])=>`<div><div class="k">${k}</div><div class="v">${v}</div></div>`).join('');
-  const prevBest = bestFor(mode);
-  $('#rBest').innerHTML = prevBest === null ? '<span class="pill ok">Primeiro resultado neste modo</span>'
-    : sum.score > prevBest.score ? `<span class="pill ok">Novo recorde! Anterior: ${prevBest.display}</span>`
-    : `<span class="pill">Recorde: ${prevBest.display}</span>`;
-  if(sum.over !== undefined && sum.over + sum.under >= 5){
-    const tip = sum.over > sum.under*1.5 ? 'Você passa do alvo com frequência (overflick). Pode ser sens alta ou braço rápido demais no fim do movimento.'
-      : sum.under > sum.over*1.5 ? 'Você para antes do alvo com frequência (underflick). Pode ser sens baixa ou falta de confiança no movimento.'
-      : 'Overflicks e underflicks estão equilibrados, sem tendência clara.';
-    $('#rExtra').innerHTML = `<div class="note">${tip}</div>`;
-  }
-  if(mode === 'spray') $('#rExtra').innerHTML = `<div class="note">Os tiros brancos caíram dentro do círculo; os vermelhos, fora. O padrão da AK sobe nas primeiras ~9 balas (puxe para baixo), depois vai para a esquerda (puxe para a direita) e depois para a direita. Este padrão é uma aproximação do jogo.</div>`;
-  pushHistory(mode, sum.score, sum.display);
+  setSceneFor(null); clearTargets(); eye.set(0,0,0); punch.x = punch.y = 0;
+  $('#results').classList.remove('hidden');
+  $('#rExtra').innerHTML = ''; $('#rStats').innerHTML = '';
+  if(run.kind === 'senstest') return renderSensResults();
+  if(run.kind === 'warmup') return renderWarmupResults();
+  const r = run.results[0];
+  $('#rMode').textContent = modeLabel(r.mode, r.variant);
+  $('#rScore').textContent = r.display;
+  $('#rStats').innerHTML = r.lines.map(([k,v])=>`<div><div class="k">${k}</div><div class="v">${v}</div></div>`).join('');
+  $('#rBest').innerHTML = bestBadge(r);
+  const tip = tipFor(r); if(tip) $('#rExtra').innerHTML = `<div class="note">${tip}</div>`;
+}
+function renderWarmupResults(){
+  $('#rMode').textContent = `Aquecimento · ${S.warmup} min`;
+  $('#rScore').textContent = 'Pronto para jogar';
+  const recs = run.results.filter(r=>r.prevBest && r.score > r.prevBest.score).length;
+  $('#rBest').innerHTML = recs ? `<span class="pill ok">${recs} recorde${recs>1?'s':''} batido${recs>1?'s':''}</span>` : '<span class="pill">Nenhum recorde hoje, mas o aquecimento está feito</span>';
+  let html = '<table style="margin-top:16px"><tr><th>Etapa</th><th>Resultado</th><th>Recorde anterior</th><th></th></tr>';
+  run.results.forEach(r=>{
+    const status = r.prevBest === null ? '<span class="pill">primeiro</span>' : r.score > r.prevBest.score ? '<span class="pill ok">recorde</span>' : `<span class="pill">${Math.round(r.score/Math.max(1e-9,r.prevBest.score)*100)}% do recorde</span>`;
+    html += `<tr><td>${esc(modeLabel(r.mode, r.variant))}</td><td><b>${esc(r.display)}</b></td><td>${r.prevBest?esc(r.prevBest.display):'—'}</td><td>${status}</td></tr>`;
+  });
+  $('#rExtra').innerHTML = html + '</table><div class="note">Se algum modo ficou bem abaixo do seu recorde, você pode estar com a mão fria ou cansado. Vale mais uma rodada só dele antes de entrar na partida.</div>';
 }
 function renderSensResults(){
-  const rows = blockResults.slice().sort((a,b)=>a.mult-b.mult);
+  const rows = run.results.slice().sort((a,b)=>a.mult-b.mult);
   const best = rows.reduce((a,b)=> b.score > a.score ? b : a, rows[0]);
+  $('#rMode').textContent = MODES.senstest.name;
   $('#rScore').textContent = (S.sens*best.mult).toFixed(2);
   $('#rBest').innerHTML = `<span class="pill ok">Melhor desempenho com ${best.mult}× da sua sens</span>`;
-  $('#rStats').innerHTML = '';
   let html = '<table><tr><th>Multiplicador</th><th>Sens CS2</th><th>cm/360</th><th>Pontos</th><th>Precisão</th><th>Tempo/alvo</th><th>Over/Under</th></tr>';
   rows.forEach(r=>{
     const cls = r === best ? ' class="best"' : '';
@@ -701,29 +1064,130 @@ function renderSensResults(){
     else if(base.under > base.over*1.5) tip += ' Na sua sens atual você tende a parar antes do alvo, o que costuma indicar sens baixa.';
   }
   $('#rExtra').innerHTML = html + `<div class="note">${tip}</div>`;
-  pushHistory('senstest', best.mult, `melhor: ${(S.sens*best.mult).toFixed(2)} (${best.mult}×)`, true);
+  pushHistory('senstest', '', best.mult, `melhor: ${(S.sens*best.mult).toFixed(2)} (${best.mult}×)`, true);
 }
 
-/* ---------- Histórico ---------- */
-function bestFor(m){
-  let b = null; history.forEach(h=>{ if(h.mode===m && !h.noBest && (b===null || h.score > b.score)) b = h; }); return b;
+/* ---------- Histórico e gráfico ---------- */
+function bestFor(m, v){
+  let b = null; v = v || '';
+  history.forEach(h=>{ if(h.mode===m && (h.variant||'')===v && !h.noBest && (b===null || h.score > b.score)) b = h; }); return b;
 }
-function pushHistory(m, score, display, noBest){
-  history.unshift({mode:m, score, display, sens:S.sens, date:Date.now(), noBest:!!noBest});
-  history = history.slice(0, 60); saveJSON('aimcs_history', history); renderHistory();
+function pushHistory(m, v, score, display, noBest){
+  history.unshift({mode:m, variant:v||'', score, display, sens:S.sens, date:Date.now(), noBest:!!noBest});
+  history = history.slice(0, 300); saveJSON('aimcs_history', history);
 }
 function renderHistory(){
   const el = $('#history');
   if(!history.length){ el.innerHTML = '<p class="hint">Nenhuma rodada ainda. Seus resultados e recordes aparecem aqui.</p>'; return; }
-  const bests = Object.keys(MODES).filter(m=>m!=='senstest').map(m=>[m,bestFor(m)]).filter(x=>x[1]);
+  const keys = chartKeys();
   let h = '';
-  if(bests.length) h += '<div class="row" style="margin-bottom:10px">' + bests.map(([m,b])=>`<span class="pill">${MODES[m].name}: <b style="color:var(--text)">${b.display}</b></span>`).join('') + '</div>';
+  if(keys.length) h += '<div class="row" style="margin-bottom:10px;gap:6px">' + keys.map(k=>{ const [m,v] = k.split(':'); const b = bestFor(m,v); return `<span class="pill">${esc(modeLabel(m,v))}: <b style="color:var(--text)">${esc(b.display)}</b></span>`; }).join('') + '</div>';
   h += '<table><tr><th>Quando</th><th>Modo</th><th>Resultado</th><th>Sens</th></tr>';
   history.slice(0,8).forEach(x=>{
     const d = new Date(x.date);
-    h += `<tr><td>${d.toLocaleDateString('pt-BR')} ${d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}</td><td>${MODES[x.mode]?MODES[x.mode].name:x.mode}</td><td>${x.display}</td><td>${x.sens}</td></tr>`;
+    h += `<tr><td>${d.toLocaleDateString('pt-BR')} ${d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}</td><td>${esc(modeLabel(x.mode, x.variant))}</td><td>${esc(x.display)}</td><td>${x.sens}</td></tr>`;
   });
   el.innerHTML = h + '</table>';
+}
+function chartKeys(){
+  const seen = [];
+  history.forEach(h=>{ if(h.noBest) return; const k = h.mode + ':' + (h.variant||''); if(!seen.includes(k)) seen.push(k); });
+  return seen;
+}
+let chartPts = [];
+function renderChartSelect(){
+  const sel = $('#chartSel'); const keys = chartKeys(); const cur = sel.value;
+  sel.innerHTML = keys.length ? keys.map(k=>{ const [m,v] = k.split(':'); return `<option value="${k}">${esc(modeLabel(m,v))}</option>`; }).join('') : '<option value="">Sem dados ainda</option>';
+  if(keys.includes(cur)) sel.value = cur;
+}
+function drawChart(){
+  const cv = $('#chart'), dpr = window.devicePixelRatio || 1;
+  const W = cv.clientWidth, H = cv.clientHeight; if(!W) return;
+  cv.width = W*dpr; cv.height = H*dpr; const g = cv.getContext('2d'); g.setTransform(dpr,0,0,dpr,0,0); g.clearRect(0,0,W,H);
+  const key = $('#chartSel').value;
+  g.font = '12px Inter, sans-serif'; g.fillStyle = '#8b97a8';
+  chartPts = [];
+  if(!key){ g.textAlign = 'center'; g.fillText('Jogue algumas rodadas para ver sua evolução aqui.', W/2, H/2); return; }
+  const [m, v] = key.split(':');
+  const data = history.filter(h=>h.mode===m && (h.variant||'')===(v||'') && !h.noBest).slice(0,40).reverse();
+  if(data.length < 2){ g.textAlign = 'center'; g.fillText('Jogue mais uma rodada deste modo para ver a linha de evolução.', W/2, H/2); }
+  const L = 46, R = 16, T = 14, B = 26;
+  const max = Math.max(...data.map(d=>d.score), 1);
+  const step = niceStep(max/4); const top = Math.ceil(max*1.08/step)*step;
+  const X = i => data.length < 2 ? L + (W-L-R)/2 : L + i*(W-L-R)/(data.length-1);
+  const Y = s => T + (1 - s/top)*(H-T-B);
+  g.textAlign = 'right'; g.textBaseline = 'middle'; g.lineWidth = 1;
+  for(let s=0; s<=top+1e-9; s+=step){
+    g.strokeStyle = 'rgba(139,151,168,0.14)'; g.beginPath(); g.moveTo(L, Math.round(Y(s))+0.5); g.lineTo(W-R, Math.round(Y(s))+0.5); g.stroke();
+    g.fillStyle = '#8b97a8'; g.fillText(fmtNum(s), L-8, Y(s));
+  }
+  g.textAlign = 'center'; g.textBaseline = 'top';
+  g.fillText('rodadas mais antigas → mais recentes', (L+W-R)/2, H-B+8);
+  const best = Math.max(...data.map(d=>d.score));
+  g.setLineDash([4,4]); g.strokeStyle = 'rgba(230,235,242,0.35)'; g.beginPath(); g.moveTo(L, Y(best)); g.lineTo(W-R, Y(best)); g.stroke(); g.setLineDash([]);
+  g.fillStyle = '#c5cdd8'; g.textAlign = 'right'; g.textBaseline = 'bottom'; g.fillText('recorde', W-R, Y(best)-3);
+  g.strokeStyle = '#f5a524'; g.lineWidth = 2; g.lineJoin = 'round'; g.beginPath();
+  data.forEach((d,i)=>{ const x = X(i), y = Y(d.score); i ? g.lineTo(x,y) : g.moveTo(x,y); chartPts.push({x,y,d}); }); g.stroke();
+  chartPts.forEach(p=>{ g.beginPath(); g.arc(p.x,p.y,4,0,Math.PI*2); g.fillStyle = '#f5a524'; g.fill(); g.lineWidth = 2; g.strokeStyle = '#121823'; g.stroke(); });
+}
+function niceStep(x){ const p = Math.pow(10, Math.floor(Math.log10(x||1))); const f = x/p; return (f<=1?1:f<=2?2:f<=5?5:10)*p; }
+function fmtNum(n){ return Math.abs(n) >= 1000 ? Math.round(n).toLocaleString('pt-BR') : (Math.round(n*10)/10).toString().replace('.',','); }
+function chartHover(e){
+  const tip = $('#chartTip'); const r = $('#chart').getBoundingClientRect(); const x = e.clientX - r.left;
+  if(!chartPts.length){ tip.style.display = 'none'; return; }
+  let best = chartPts[0]; chartPts.forEach(p=>{ if(Math.abs(p.x-x) < Math.abs(best.x-x)) best = p; });
+  const d = new Date(best.d.date);
+  tip.innerHTML = `<b>${esc(best.d.display)}</b><br><span style="color:var(--muted)">${d.toLocaleDateString('pt-BR')} ${d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})} · sens ${best.d.sens}</span>`;
+  tip.style.left = best.x+'px'; tip.style.top = best.y+'px'; tip.style.display = 'block';
+}
+
+/* ---------- Crosshair (fórmula do CS) ---------- */
+const XH_PRESETS = [[250,50,50],[50,250,50],[250,250,50],[50,50,250],[50,250,250]];
+function xhRGB(){ const x = S.xh; return x.color < 5 ? XH_PRESETS[x.color] : [x.r, x.g, x.b]; }
+function drawXhair(cv, k, cssSize){
+  const dpr = window.devicePixelRatio || 1;
+  cv.width = Math.round(cssSize[0]*dpr); cv.height = Math.round(cssSize[1]*dpr);
+  const g = cv.getContext('2d'); g.clearRect(0,0,cv.width,cv.height);
+  const x = S.xh, kk = k*dpr;
+  const len = Math.round(x.size*kk);
+  const th = Math.max(1, Math.round(x.thick*kk));
+  const gap = Math.ceil(1.6*kk + x.gap*dpr);
+  const cx = Math.floor(cv.width/2), cy = Math.floor(cv.height/2);
+  const x0 = cx - Math.floor(th/2), y0 = cy - Math.floor(th/2);
+  const rects = [];
+  if(len > 0){
+    if(!x.tstyle) rects.push([x0, y0-gap-len, th, len]);
+    rects.push([x0, y0+th+gap, th, len]);
+    rects.push([x0-gap-len, y0, len, th]);
+    rects.push([x0+th+gap, y0, len, th]);
+  }
+  if(x.dot) rects.push([x0, y0, th, th]);
+  const a = x.alphaEn ? x.alpha/255 : 1;
+  if(x.outline){ const o = Math.max(1, Math.round(x.outlineThick*dpr)); g.fillStyle = `rgba(0,0,0,${a})`; rects.forEach(r=>g.fillRect(r[0]-o, r[1]-o, r[2]+2*o, r[3]+2*o)); }
+  const [r,gg,b] = xhRGB(); g.fillStyle = `rgba(${r},${gg},${b},${a})`;
+  rects.forEach(rc=>g.fillRect(rc[0], rc[1], rc[2], rc[3]));
+}
+function drawCrosshairs(){
+  const xc = $('#xhair');
+  drawXhair(xc, innerHeight/480, [160,160]);
+  xc.style.transform = `translate(-50%,-50%) scaleX(${xhScaleX})`;
+  drawXhair($('#xprev'), 1080/480, [120,110]);
+}
+const XH_DICT = 'ABCDEFGHJKLMNOPQRSTUVWXYZabcdefhijkmnopqrstuvwxyz23456789';
+function decodeXhCode(code){
+  code = code.trim();
+  if(!/^CSGO(-?[\w]{5}){5}$/.test(code)) return {err:'Formato inválido. O código começa com CSGO- e tem cinco grupos de cinco caracteres.'};
+  if(typeof BigInt === 'undefined') return {err:'Seu navegador não suporta este recurso.'};
+  const s = code.replace(/CSGO|-/g, ''); let big = 0n;
+  for(const c of Array.from(s).reverse()){ const i = XH_DICT.indexOf(c); if(i < 0) return {err:'Código com caracteres inválidos.'}; big = big*57n + BigInt(i); }
+  const hex = big.toString(16).padStart(36,'0'); const b = [];
+  for(let i=0;i<36;i+=2) b.push(parseInt(hex.slice(i,i+2),16));
+  const sum = b.slice(1).reduce((a,x)=>a+x,0) % 256;
+  if(b[0] !== sum || b[1] !== 1) return {err:'Não reconheci este código. Se ele foi gerado depois da atualização de setembro de 2026 do CS2, o formato mudou e ainda não é suportado aqui. Ajuste a mira manualmente abaixo.'};
+  const i8 = v => v > 127 ? v - 256 : v;
+  return {gap:i8(b[2])/10, outlineThick:(b[3]&7)/2, r:b[4], g:b[5], b:b[6], alpha:b[7], color:b[10]&7,
+    outline:!!(b[10]&8), thick:b[12]/10, dot:!!((b[13]>>4)&1), alphaEn:!!((b[13]>>4)&4), tstyle:!!((b[13]>>4)&8),
+    style:(b[13]&0xf)>>1, size:(((b[15]&0x1f)<<8)+b[14])/10};
 }
 
 /* ---------- Menu / UI ---------- */
@@ -731,15 +1195,20 @@ function cm360(sens){ return 360/(M_YAW*sens) / S.dpi * 2.54; }
 function updateDerived(){
   $('#dEdpi').textContent = Math.round(S.sens*S.dpi);
   $('#dCm').textContent = cm360(S.sens).toFixed(1);
+  updateConverter();
 }
-function drawCrosshair(cv){
-  const g = cv.getContext('2d'), W = cv.width, c = Math.floor(W/2);
-  g.clearRect(0,0,W,W);
-  const s = S.chSize*2, gap = S.chGap*2+2, th = S.chThick;
-  const rects = [[c-Math.floor(th/2), c-gap-s, th, s],[c-Math.floor(th/2), c+gap, th, s],[c-gap-s, c-Math.floor(th/2), s, th],[c+gap, c-Math.floor(th/2), s, th]];
-  if(S.chDot) rects.push([c-Math.floor(th/2), c-Math.floor(th/2), th, th]);
-  g.fillStyle = 'rgba(0,0,0,0.9)'; rects.forEach(r=>g.fillRect(r[0]-1,r[1]-1,r[2]+2,r[3]+2));
-  g.fillStyle = S.chColor; rects.forEach(r=>g.fillRect(r[0],r[1],r[2],r[3]));
+function updateConverter(){
+  const G = GAMES[$('#cvGame').value] || GAMES.valorant; const v = parseFloat($('#cvSens').value);
+  $('#cvOut').textContent = v > 0 ? (v*G.yaw/M_YAW).toFixed(3) : '—';
+  $('#cvRev').textContent = `Sua sens ${S.sens} do CS2 no ${G.name}: ${(S.sens*M_YAW/G.yaw).toFixed(3)}`;
+}
+function syncXhUI(){
+  const x = S.xh;
+  $('#xSize').value = x.size; $('#xGap').value = x.gap; $('#xThick').value = x.thick; $('#xAlpha').value = x.alphaEn ? x.alpha : 255;
+  $('#vSize').textContent = x.size; $('#vGap').textContent = x.gap; $('#vThick').textContent = x.thick; $('#vAlpha').textContent = x.alphaEn ? x.alpha : 255;
+  $('#xOutline').checked = x.outline; $('#xDot').checked = x.dot; $('#xT').checked = x.tstyle;
+  document.querySelectorAll('#swatches .sw').forEach(el=>el.classList.toggle('on', +el.dataset.i === x.color));
+  const [r,g,b] = xhRGB(); $('#xCustom').value = '#' + [r,g,b].map(n=>n.toString(16).padStart(2,'0')).join('');
 }
 function showMenu(){
   state = 'menu'; mode = null; curMult = 1;
@@ -747,64 +1216,112 @@ function showMenu(){
   ['#results','#pause'].forEach(s=>$(s).classList.add('hidden'));
   $('#menu').classList.remove('hidden');
   $('#hud').style.display = 'none'; $('#xhair').style.display = 'none'; $('#countdown').classList.add('hidden');
-  clearTargets(); sprayGroup.visible = false; bot.group.visible = false;
-  renderHistory();
+  clearTargets(); setSceneFor(null); eye.set(0,0,0); punch.x = punch.y = 0;
+  renderHistory(); renderChartSelect(); drawChart();
 }
 function initUI(){
   $('#modes').innerHTML = Object.entries(MODES).map(([k,m])=>
-    `<button class="mode" data-mode="${k}"><div class="tag">${m.tag}</div><div class="t">${m.name}</div><div class="d">${m.desc}</div><div class="b">Jogar →</div></button>`).join('');
-  document.querySelectorAll('.mode').forEach(b=>b.addEventListener('click', ()=>startMode(b.dataset.mode)));
+    `<button class="mode${m.featured?' featured':''}" data-mode="${k}"><div class="tag">${m.tag}</div><div class="t">${m.name}${m.isNew?'<span class="new">NOVO</span>':''}</div><div class="d">${m.desc}</div><div class="b">${k==='warmup'?'Começar aquecimento →':'Jogar →'}</div></button>`).join('');
+  document.querySelectorAll('.mode').forEach(b=>b.addEventListener('click', ()=>startRun(b.dataset.mode)));
+  $('#sWeapon').innerHTML = Object.entries(WEAPONS).map(([k,w])=>`<option value="${k}">${w.name} · ${w.mag}</option>`).join('');
+  $('#cvGame').innerHTML = Object.entries(GAMES).map(([k,g])=>`<option value="${k}">${g.name}</option>`).join('');
+  $('#cvGame').value = S.cvGame;
+  const after = () => { saveSettings(); updateDerived(); };
   const bind = (id, key, parse, evt) => { const el = $(id);
     if(el.type === 'checkbox') el.checked = S[key]; else el.value = S[key];
-    el.addEventListener(evt||'input', ()=>{ const v = el.type==='checkbox' ? el.checked : parse(el.value);
-      if(el.type!=='checkbox' && (isNaN(v) || v<=0) && key!=='chGap') return;
-      S[key] = v; saveSettings(); updateDerived(); drawCrosshair($('#xhair')); drawCrosshair($('#xprev')); }); };
+    el.addEventListener(evt||'input', ()=>{ const v = el.type==='checkbox' ? el.checked : (parse ? parse(el.value) : el.value);
+      if(typeof v === 'number' && (isNaN(v) || v <= 0)) return;
+      S[key] = v; after();
+      if(key === 'aspect') applyAspect();
+    }); };
   bind('#sSens','sens',parseFloat); bind('#sDpi','dpi',parseFloat); bind('#sFac','factor',parseFloat);
-  bind('#sDur','duration',v=>parseInt(v,10),'change'); bind('#sVol','volume',parseFloat); bind('#sPat','showPattern',null,'change');
-  bind('#cSize','chSize',v=>parseInt(v,10)); bind('#cGap','chGap',v=>parseInt(v,10)); bind('#cThick','chThick',v=>parseInt(v,10)); bind('#cDot','chDot',null,'change');
+  bind('#sDur','duration',v=>parseInt(v,10),'change'); bind('#sWarm','warmup',v=>parseInt(v,10),'change');
+  bind('#sAspect','aspect',null,'change'); bind('#sVol','volume',parseFloat);
+  bind('#sWeapon','weapon',null,'change'); bind('#sPat','showPattern',null,'change'); bind('#sPunch','aimPunch',null,'change');
   $('#sVol').value = S.volume;
-  const colors = ['#3dff6e','#2fd4ff','#ffe347','#ffffff','#ff4fd8','#ff5468'];
+  // crosshair
+  const xb = (id, key, parse) => $(id).addEventListener('input', ()=>{ const el = $(id); S.xh[key] = el.type==='checkbox' ? el.checked : parse(el.value); if(key==='alpha') S.xh.alphaEn = true; saveSettings(); syncXhUI(); drawCrosshairs(); });
+  xb('#xSize','size',parseFloat); xb('#xGap','gap',parseFloat); xb('#xThick','thick',parseFloat); xb('#xAlpha','alpha',v=>parseInt(v,10));
+  xb('#xOutline','outline'); xb('#xDot','dot'); xb('#xT','tstyle');
   const sw = $('#swatches');
-  sw.innerHTML = colors.map(c=>`<div class="sw${c===S.chColor?' on':''}" data-c="${c}" style="background:${c}"></div>`).join('');
-  sw.querySelectorAll('.sw').forEach(el=>el.addEventListener('click', ()=>{
-    S.chColor = el.dataset.c; saveSettings(); sw.querySelectorAll('.sw').forEach(x=>x.classList.toggle('on', x===el));
-    drawCrosshair($('#xhair')); drawCrosshair($('#xprev')); }));
-  $('#fsBtn').addEventListener('click', ()=>{ try{ const p = document.documentElement.requestFullscreen(); if(p&&p.catch) p.catch(()=>{}); }catch(e){} });
+  sw.innerHTML = XH_PRESETS.map((c,i)=>`<div class="sw" data-i="${i}" title="cor ${i}" style="background:rgb(${c.join(',')})"></div>`).join('') + '<input type="color" id="xCustom" title="Cor personalizada">';
+  sw.querySelectorAll('.sw').forEach(el=>el.addEventListener('click', ()=>{ S.xh.color = +el.dataset.i; saveSettings(); syncXhUI(); drawCrosshairs(); }));
+  $('#xCustom').addEventListener('input', e=>{ const h = e.target.value; S.xh.color = 5; S.xh.r = parseInt(h.slice(1,3),16); S.xh.g = parseInt(h.slice(3,5),16); S.xh.b = parseInt(h.slice(5,7),16); saveSettings(); syncXhUI(); drawCrosshairs(); });
+  $('#xhImport').addEventListener('click', ()=>{
+    const res = decodeXhCode($('#xhCode').value); const m = $('#xhMsg');
+    if(res.err){ m.className = 'msg err'; m.textContent = res.err; return; }
+    Object.assign(S.xh, {size:res.size, gap:res.gap, thick:res.thick, outline:res.outline, outlineThick:Math.max(0.5,res.outlineThick), dot:res.dot, tstyle:res.tstyle, color:res.color>5?5:res.color, r:res.r, g:res.g, b:res.b, alpha:res.alpha, alphaEn:res.alphaEn});
+    saveSettings(); syncXhUI(); drawCrosshairs();
+    m.className = 'msg ok';
+    m.textContent = `Importado: tamanho ${res.size}, gap ${res.gap}, espessura ${res.thick}${res.outline?', com contorno':''}${res.dot?', com ponto':''}.` + (res.style <= 1 ? ' Seu crosshair é dinâmico no jogo; aqui ele aparece fixo.' : '');
+  });
+  // conversor
+  $('#cvGame').addEventListener('change', ()=>{ S.cvGame = $('#cvGame').value; saveSettings(); updateConverter(); });
+  $('#cvSens').addEventListener('input', updateConverter);
+  $('#cvUse').addEventListener('click', ()=>{ const v = parseFloat($('#cvOut').textContent); if(v > 0){ S.sens = Math.round(v*1000)/1000; $('#sSens').value = S.sens; after(); } });
+  // DPI
   $('#calOpenBtn').addEventListener('click', openCal);
   $('#calCloseBtn').addEventListener('click', closeCal);
   $('#calResetBtn').addEventListener('click', ()=>{ calib.samples = []; calib.measuring = false; $('#calLive').textContent = '0'; renderCal(); });
   $('#calLockBtn').addEventListener('click', ()=>{ if(calib.samples.length >= 3){ calib.samples = []; $('#calLive').textContent = '0'; } requestLock(); renderCal(); });
   $('#calRef').addEventListener('change', ()=>{ $('#calCustomRow').classList.toggle('hidden', $('#calRef').value !== 'custom'); });
+  // navegação
+  $('#fsBtn').addEventListener('click', ()=>{ try{ const p = document.documentElement.requestFullscreen(); if(p&&p.catch) p.catch(()=>{}); }catch(e){} });
   $('#resumeBtn').addEventListener('click', ()=>{ ensureAudio(); requestLock(); });
   $('#quitBtn').addEventListener('click', showMenu);
-  $('#againBtn').addEventListener('click', ()=>startMode(mode));
+  $('#againBtn').addEventListener('click', ()=>startRun(run.kind));
   $('#menuBtn').addEventListener('click', showMenu);
-  updateDerived(); drawCrosshair($('#xhair')); drawCrosshair($('#xprev')); renderHistory();
+  // gráfico
+  $('#chartSel').addEventListener('change', drawChart);
+  $('#chart').addEventListener('mousemove', chartHover);
+  $('#chart').addEventListener('mouseleave', ()=>{ $('#chartTip').style.display = 'none'; });
+  addEventListener('resize', ()=>{ if(state==='menu') drawChart(); });
+  updateDerived(); syncXhUI(); applyAspect(); renderHistory(); renderChartSelect(); drawChart();
 }
+
+/* ---------- PWA (modo offline) ---------- */
+let installEvt = null;
+addEventListener('beforeinstallprompt', e=>{ e.preventDefault(); installEvt = e; $('#installBtn').classList.remove('hidden'); });
+$('#installBtn').addEventListener('click', ()=>{ if(!installEvt) return; installEvt.prompt(); installEvt = null; $('#installBtn').classList.add('hidden'); });
+try{ if('serviceWorker' in navigator && location.protocol === 'https:' && window.top === window.self) navigator.serviceWorker.register('sw.js').catch(()=>{}); }catch(e){}
 
 /* ---------- Loop ---------- */
 let lastT = performance.now(), fpsAcc = 0, fpsN = 0, fpsT = 0;
 function updateHUD(){
   const cd = $('#countdown');
   if(state === 'countdown'){
-    const left = Math.max(0, countdownEnd - clock);
+    const left = Math.max(0, countdownEnd - clock); const b = curBlock();
     cd.classList.remove('hidden');
-    cd.innerHTML = Math.ceil(left/1000) + (blocks ? `<small>BLOCO ${blockIdx+1} DE 3</small>` : '');
-    $('#hTime').textContent = blockDuration().toFixed(1);
+    let sub = b.label ? b.label : '';
+    if(run.kind === 'warmup') sub += ` · ${Math.round(b.dur/60*10)/10} min`;
+    if(mode === 'strafe') sub = (sub?sub+' · ':'') + 'Faça strafe com A/D, pare e atire';
+    if(mode === 'preaim') sub = (sub?sub+' · ':'') + 'Segure as quinas na altura da cabeça';
+    cd.innerHTML = Math.ceil(left/1000) + (sub ? `<small>${sub}</small>` : '');
+    $('#hTime').textContent = b.dur.toFixed(1);
   } else cd.classList.add('hidden');
+  const pr = $('#hudPrompt');
+  if(state === 'playing' && clock < promptUntil){ pr.textContent = promptText; pr.style.color = promptColor; }
+  else if(state === 'playing' && mode === 'strafe' && !strafe.target){ pr.textContent = 'Faça strafe (A ou D) para revelar o alvo'; pr.style.color = '#e6ebf2'; }
+  else pr.textContent = '';
   if(state !== 'playing') return;
   $('#hTime').textContent = Math.max(0, (runEnd-clock)/1000).toFixed(1);
+  const sc = $('#hScore'), ac = $('#hAcc');
   if(mode === 'tracking'){
-    $('#hScore').textContent = stats.total ? (stats.onT/stats.total*100).toFixed(1)+'%' : '—';
-    $('#hAcc').textContent = Math.round(stats.total)+'s';
+    sc.textContent = stats.total ? pct(stats.headT, stats.total).toFixed(0)+'%' : '—';
+    ac.textContent = stats.total ? pct(stats.bodyT, stats.total).toFixed(0)+'%' : '—';
   } else if(mode === 'spray'){
-    $('#hScore').textContent = stats.shots ? (stats.hits/stats.shots*100).toFixed(0)+'%' : '—';
-    $('#hAcc').textContent = stats.sprays.length ? (avg(stats.sprays)*100).toFixed(0)+'%' : '—';
-    const ammo = 30 - sprayIdx;
-    $('#hudAmmo').innerHTML = (curSpray || sprayIdx ? ammo : 30) + '<small>/30</small>';
+    const W = weapon();
+    sc.textContent = stats.shots ? pct(stats.hits, stats.shots).toFixed(0)+'%' : '—';
+    ac.textContent = stats.sprays.length ? (avg(stats.sprays)*100).toFixed(0)+'%' : '—';
+    $('#hudAmmo').innerHTML = `<span class="w">${W.name}</span>${W.mag - sprayIdx}<small>/${W.mag}</small>`;
+  } else if(mode === 'preaim'){
+    sc.textContent = stats.points; ac.textContent = stats.heads;
+  } else if(mode === 'strafe'){
+    sc.textContent = stats.kills; ac.textContent = stats.shots ? pct(stats.still, stats.shots).toFixed(0)+'%' : '—';
+    const sp = $('#hSpeed'); sp.textContent = Math.round(mv.speed); sp.style.color = mv.speed <= ACCURATE ? '#3dff8a' : '#ff5468';
   } else {
-    $('#hScore').textContent = stats.kills;
-    $('#hAcc').textContent = stats.shots ? (stats.hits/stats.shots*100).toFixed(0)+'%' : '—';
+    sc.textContent = stats.kills;
+    ac.textContent = stats.shots ? pct(stats.hits, stats.shots).toFixed(0)+'%' : '—';
   }
 }
 function loop(t){
@@ -815,15 +1332,17 @@ function loop(t){
   if(state === 'menu' || state === 'results'){ yaw += dt*4; pitch = 4; }
   if(state === 'countdown' || state === 'playing'){
     clock += dt*1000;
-    if(state === 'countdown' && clock >= countdownEnd){
-      state = 'playing'; runEnd = clock + blockDuration()*1000; lastKill = clock; spawnInitial();
-    }
+    if(state === 'countdown' && clock >= countdownEnd) startPlaying();
+    if(state === 'countdown' && mode === 'strafe') updateMovement(dt);
     if(state === 'playing'){
-      if(mode === 'tracking') updateBot(dt);
-      if(mode === 'spray') updateSpray();
+      if(mode === 'tracking') updateTracking(dt);
+      else if(mode === 'spray') updateSpray();
+      else if(mode === 'preaim') updatePreaim();
+      else if(mode === 'strafe') updateStrafe(dt);
       if(clock >= runEnd) endBlock();
     }
   }
+  if(!firing){ const k = Math.exp(-dt*7); punch.x *= k; punch.y *= k; }
   for(const tg of targets){ const k = Math.min(1, (clock - tg.born)/90); tg.mesh.scale.setScalar(tg.r*(0.3+0.7*k)); }
   for(let i=effects.length-1;i>=0;i--){
     const e = effects[i]; e.t += dt;
@@ -831,7 +1350,8 @@ function loop(t){
     if(k >= 1){ scene.remove(e.m); e.m.material.dispose(); effects.splice(i,1); }
   }
   updateHUD();
-  camera.rotation.set(pitch*DEG, yaw*DEG, 0);
+  camera.position.copy(eye);
+  camera.rotation.set((pitch + punch.y)*DEG, (yaw - punch.x)*DEG, 0);
   renderer.render(scene, camera);
 }
 
