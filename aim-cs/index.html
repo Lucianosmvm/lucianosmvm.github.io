@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AIM//CS — Treino de Mira para CS2</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0b0f16; --panel:#121823; --panel2:#18202d; --line:#263042; --text:#e6ebf2; --muted:#8b97a8;
+  --accent:#f5a524; --accent2:#2fd4ff; --good:#3dff8a; --bad:#ff5468;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--text);font-family:Inter,system-ui,sans-serif;overflow:hidden}
+#game{position:fixed;inset:0;width:100vw;height:100vh;display:block}
+#xhair{position:fixed;left:50%;top:50%;width:96px;height:96px;transform:translate(-50%,-50%);pointer-events:none;z-index:5;display:none}
+#hitmarker{position:fixed;left:50%;top:50%;width:34px;height:34px;transform:translate(-50%,-50%);pointer-events:none;z-index:6;opacity:0}
+#hitmarker.show{animation:hm .18s ease-out}
+@keyframes hm{0%{opacity:1;transform:translate(-50%,-50%) scale(1.15)}100%{opacity:0;transform:translate(-50%,-50%) scale(.9)}}
+.hidden{display:none!important}
+
+/* HUD */
+#hud{position:fixed;inset:0;pointer-events:none;z-index:4;display:none;font-family:Rajdhani,sans-serif}
+#hudTop{position:absolute;top:18px;left:50%;transform:translateX(-50%);display:flex;gap:10px}
+.hbox{background:rgba(10,14,20,.72);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:6px 16px;text-align:center;min-width:92px}
+.hbox .k{font-size:11px;letter-spacing:.14em;color:var(--muted);text-transform:uppercase;font-family:Inter}
+.hbox .v{font-size:28px;font-weight:700;line-height:1.1}
+#hudTimer .v{color:var(--accent)}
+#hudBottom{position:absolute;bottom:16px;left:20px;font-size:15px;color:var(--muted);letter-spacing:.04em}
+#hudBottom b{color:var(--text)}
+#hudFps{position:absolute;top:12px;right:16px;font-size:13px;color:var(--muted);font-family:Inter}
+#hudAmmo{position:absolute;bottom:16px;right:24px;font-size:42px;font-weight:700}
+#hudAmmo small{font-size:20px;color:var(--muted)}
+#countdown{position:fixed;left:50%;top:38%;transform:translate(-50%,-50%);font-family:Rajdhani;font-size:120px;font-weight:700;color:var(--accent);z-index:7;pointer-events:none;text-shadow:0 4px 30px rgba(0,0,0,.6)}
+#countdown small{display:block;font-size:22px;color:var(--text);text-align:center;letter-spacing:.1em}
+
+/* Overlays */
+.overlay{position:fixed;inset:0;z-index:10;display:flex;align-items:center;justify-content:center;background:rgba(6,9,14,.78);backdrop-filter:blur(6px);overflow:auto;padding:24px}
+#menu{align-items:flex-start}
+.wrap{width:min(1180px,100%);margin:auto}
+header.top{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:18px;flex-wrap:wrap}
+.logo{font-family:Rajdhani;font-weight:700;font-size:44px;letter-spacing:.04em;line-height:1}
+.logo span{color:var(--accent)}
+.sub{color:var(--muted);font-size:14px;margin-top:4px}
+.grid{display:grid;grid-template-columns:340px 1fr;gap:18px}
+@media (max-width:900px){.grid{grid-template-columns:1fr}}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px}
+.card h3{margin:0 0 12px;font-family:Rajdhani;font-size:19px;letter-spacing:.06em;text-transform:uppercase;color:var(--text)}
+.field{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:9px 0;font-size:13.5px}
+.field label{color:var(--muted)}
+.field input[type=number],.field select{width:110px;background:var(--panel2);border:1px solid var(--line);color:var(--text);border-radius:7px;padding:7px 9px;font:inherit}
+.field input[type=range]{width:130px;accent-color:var(--accent)}
+.field input[type=checkbox]{accent-color:var(--accent);width:16px;height:16px}
+.derived{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0 4px}
+.derived div{background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:8px 10px}
+.derived .k{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em}
+.derived .v{font-family:Rajdhani;font-size:22px;font-weight:700}
+.hint{font-size:12px;color:var(--muted);line-height:1.45;margin:6px 0 0}
+.sep{height:1px;background:var(--line);margin:14px 0}
+.swatches{display:flex;gap:6px}
+.sw{width:22px;height:22px;border-radius:6px;border:2px solid transparent;cursor:pointer}
+.sw.on{border-color:#fff}
+.xprev{display:flex;align-items:center;justify-content:center;background:#2a3140;border-radius:8px;height:80px;margin-top:6px;background-image:linear-gradient(45deg,#3a4458 25%,transparent 25%),linear-gradient(-45deg,#3a4458 25%,transparent 25%);background-size:16px 16px}
+.modes{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+.mode{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:14px 14px 12px;cursor:pointer;text-align:left;color:var(--text);font:inherit;transition:border-color .15s,transform .15s}
+.mode:hover{border-color:var(--accent);transform:translateY(-2px)}
+.mode .t{font-family:Rajdhani;font-size:21px;font-weight:700;letter-spacing:.03em}
+.mode .d{font-size:13px;color:var(--muted);margin-top:4px;line-height:1.45;min-height:56px}
+.mode .b{margin-top:8px;font-size:12px;color:var(--accent)}
+.mode .tag{display:inline-block;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent2);margin-bottom:2px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{text-align:left;padding:7px 6px;border-bottom:1px solid var(--line)}
+th{color:var(--muted);font-weight:500;font-size:11.5px;text-transform:uppercase;letter-spacing:.08em}
+.btn{background:var(--accent);color:#111;border:0;border-radius:9px;padding:11px 18px;font-weight:600;font:inherit;font-weight:600;cursor:pointer}
+.btn.ghost{background:transparent;color:var(--text);border:1px solid var(--line)}
+.btn:hover{filter:brightness(1.08)}
+.row{display:flex;gap:10px;flex-wrap:wrap}
+.panel-center{width:min(640px,100%);text-align:center}
+.big{font-family:Rajdhani;font-size:76px;font-weight:700;color:var(--accent);line-height:1}
+.statgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin:18px 0}
+.statgrid div{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:10px}
+.statgrid .k{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em}
+.statgrid .v{font-family:Rajdhani;font-size:26px;font-weight:700}
+.pill{display:inline-block;padding:3px 10px;border-radius:99px;font-size:12px;border:1px solid var(--line);color:var(--muted)}
+.pill.ok{color:var(--good);border-color:rgba(61,255,138,.35)}
+.pill.warn{color:var(--accent);border-color:rgba(245,165,36,.35)}
+.best{color:var(--good);font-weight:600}
+.note{background:rgba(245,165,36,.08);border:1px solid rgba(245,165,36,.25);border-radius:10px;padding:10px 12px;font-size:13px;line-height:1.5;text-align:left;margin-top:12px}
+.right-col{display:flex;flex-direction:column;gap:18px}
+</style>
+</head>
+<body>
+<canvas id="game"></canvas>
+<canvas id="xhair" width="96" height="96"></canvas>
+<svg id="hitmarker" viewBox="0 0 34 34"><g stroke="#fff" stroke-width="2.4" stroke-linecap="round"><line x1="5" y1="5" x2="12" y2="12"/><line x1="29" y1="5" x2="22" y2="12"/><line x1="5" y1="29" x2="12" y2="22"/><line x1="29" y1="29" x2="22" y2="22"/></g></svg>
+
+<div id="hud">
+  <div id="hudTop">
+    <div class="hbox" id="hudTimer"><div class="k">Tempo</div><div class="v" id="hTime">60.0</div></div>
+    <div class="hbox"><div class="k" id="hScoreK">Pontos</div><div class="v" id="hScore">0</div></div>
+    <div class="hbox"><div class="k" id="hAccK">Precisão</div><div class="v" id="hAcc">—</div></div>
+  </div>
+  <div id="hudFps">— fps</div>
+  <div id="hudBottom"></div>
+  <div id="hudAmmo" class="hidden">30<small>/30</small></div>
+</div>
+<div id="countdown" class="hidden"></div>
+
+<!-- MENU -->
+<div id="menu" class="overlay">
+  <div class="wrap">
+    <header class="top">
+      <div>
+        <div class="logo">AIM<span>//</span>CS</div>
+        <div class="sub">Treino de mira com a sensibilidade exata do CS2 (m_yaw 0.022 · FOV vertical 73.74°)</div>
+      </div>
+      <div class="row">
+        <span class="pill" id="rawBadge">Raw input: testado ao iniciar</span>
+        <button class="btn ghost" id="fsBtn">Tela cheia</button>
+      </div>
+    </header>
+    <div class="grid">
+      <div class="card">
+        <h3>Sua configuração</h3>
+        <div class="field"><label for="sSens">Sensibilidade (CS2)</label><input type="number" id="sSens" step="0.01" min="0.05" max="20"></div>
+        <div class="field"><label for="sDpi">DPI do mouse</label><input type="number" id="sDpi" step="50" min="100" max="32000"></div>
+        <button class="btn ghost" id="calOpenBtn" style="width:100%;padding:8px 12px;font-size:13px">Não sabe seu DPI? Medir agora</button>
+        <div class="derived">
+          <div><div class="k">eDPI</div><div class="v" id="dEdpi">—</div></div>
+          <div><div class="k">cm / 360°</div><div class="v" id="dCm">—</div></div>
+        </div>
+        <p class="hint">O giro aqui fica idêntico ao do CS2 se você usar a mesma sens e deixar o botão de DPI do mouse no mesmo estágio do jogo. Você nem precisa saber o número: ele só serve para calcular o cm/360.</p>
+        <div class="sep"></div>
+        <div class="field"><label for="sDur">Duração da rodada</label><select id="sDur"><option value="30">30 s</option><option value="60">60 s</option><option value="90">90 s</option></select></div>
+        <div class="field"><label for="sVol">Volume</label><input type="range" id="sVol" min="0" max="1" step="0.05"></div>
+        <div class="field"><label for="sPat">Mostrar padrão no spray</label><input type="checkbox" id="sPat"></div>
+        <div class="field"><label for="sFac">Fator de correção do input</label><input type="number" id="sFac" step="0.01" min="0.1" max="5"></div>
+        <p class="hint">Deixe em 1. Mude só se, no seu navegador, girar 360° aqui exigir uma distância diferente da do CS (por exemplo, por escala do Windows).</p>
+        <div class="sep"></div>
+        <h3>Crosshair</h3>
+        <div class="field"><label>Cor</label><div class="swatches" id="swatches"></div></div>
+        <div class="field"><label for="cSize">Tamanho</label><input type="range" id="cSize" min="1" max="14" step="1"></div>
+        <div class="field"><label for="cGap">Gap</label><input type="range" id="cGap" min="-2" max="10" step="1"></div>
+        <div class="field"><label for="cThick">Espessura</label><input type="range" id="cThick" min="1" max="5" step="1"></div>
+        <div class="field"><label for="cDot">Ponto central</label><input type="checkbox" id="cDot"></div>
+        <div class="xprev"><canvas id="xprev" width="96" height="96"></canvas></div>
+      </div>
+      <div class="right-col">
+        <div class="card">
+          <h3>Modos de treino</h3>
+          <div class="modes" id="modes"></div>
+          <p class="hint" style="margin-top:12px">Clique num modo para travar o mouse e começar. <b>Esc</b> pausa. Se o mouse não travar, abra a página numa aba própria ou em tela cheia. Funciona melhor no Chrome ou Edge, que suportam raw input.</p>
+        </div>
+        <div class="card">
+          <h3>Histórico</h3>
+          <div id="history"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- DPI CALIBRATION -->
+<div id="dpiCal" class="overlay hidden">
+  <div class="card" style="width:min(640px,100%)">
+    <h3>Medir o DPI do mouse</h3>
+    <p class="hint" style="font-size:13px">O navegador não consegue ler o DPI direto do mouse. Mas ele conta os pontos que o sensor envia, então basta arrastar o mouse por uma distância conhecida que o DPI sai na conta.</p>
+    <div class="field" style="margin-top:14px"><label for="calRef">Referência no mousepad</label>
+      <select id="calRef" style="width:250px">
+        <option value="10">Régua: 10 cm</option>
+        <option value="21">Folha A4: lado curto (21 cm)</option>
+        <option value="8.56">Cartão de banco: largura (8,56 cm)</option>
+        <option value="custom">Outra distância…</option>
+      </select></div>
+    <div class="field hidden" id="calCustomRow"><label for="calCustom">Distância (cm)</label><input type="number" id="calCustom" step="0.1" min="2" value="15"></div>
+    <ol class="hint" style="font-size:13px;padding-left:18px;margin:10px 0">
+      <li>Coloque a referência no mousepad e encoste a lateral do mouse no início dela.</li>
+      <li>Clique em <b>Começar medição</b> (o cursor some).</li>
+      <li><b>Segure o botão esquerdo</b>, arraste em linha reta até a mesma lateral do mouse chegar ao fim da referência e <b>solte</b>.</li>
+      <li>Repita 3 vezes. A média aparece no final.</li>
+    </ol>
+    <div style="background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:14px;text-align:center">
+      <div class="sub" id="calStatus">Clique em Começar medição para travar o mouse.</div>
+      <div class="big" id="calLive" style="font-size:54px">0</div>
+      <div class="hint" style="margin:0">pontos contados nesta medição</div>
+      <div id="calSamples" class="row" style="justify-content:center;margin-top:10px"></div>
+    </div>
+    <div id="calResult"></div>
+    <div class="row" style="margin-top:14px">
+      <button class="btn" id="calLockBtn">Começar medição</button>
+      <button class="btn ghost" id="calResetBtn">Recomeçar</button>
+      <button class="btn ghost" id="calCloseBtn">Fechar</button>
+    </div>
+  </div>
+</div>
+
+<!-- PAUSE -->
+<div id="pause" class="overlay hidden">
+  <div class="card panel-center">
+    <div class="logo" style="font-size:36px" id="pauseTitle">Pausado</div>
+    <p class="sub" id="pauseMsg" style="margin:10px 0 18px">Clique em continuar para travar o mouse de novo.</p>
+    <div class="row" style="justify-content:center">
+      <button class="btn" id="resumeBtn">Continuar</button>
+      <button class="btn ghost" id="quitBtn">Sair para o menu</button>
+    </div>
+  </div>
+</div>
+
+<!-- RESULTS -->
+<div id="results" class="overlay hidden">
+  <div class="card panel-center" style="width:min(760px,100%)">
+    <div class="sub" id="rMode" style="text-transform:uppercase;letter-spacing:.14em">Modo</div>
+    <div class="big" id="rScore">0</div>
+    <div id="rBest" style="margin-top:6px"></div>
+    <div class="statgrid" id="rStats"></div>
+    <div id="rExtra"></div>
+    <div class="row" style="justify-content:center;margin-top:18px">
+      <button class="btn" id="againBtn">Jogar de novo</button>
+      <button class="btn ghost" id="menuBtn">Menu</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(function(){
+'use strict';
+const $ = s => document.querySelector(s);
+const DEG = Math.PI/180;
+const M_YAW = 0.022;          // graus por count no CS2 (m_yaw / m_pitch)
+const CS_VFOV = 73.7398;      // FOV vertical do CS2 (90° horizontal em 4:3, Hor+)
+const rand = (a,b) => a + Math.random()*(b-a);
+const wrap = a => { a = ((a+180)%360+360)%360-180; return a; };
+const avg = arr => arr.length ? arr.reduce((s,x)=>s+x,0)/arr.length : 0;
+
+/* ---------- Persistência ---------- */
+function loadJSON(k,d){ try{ const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; }catch(e){ return d; } }
+function saveJSON(k,v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} }
+const DEFAULTS = {sens:1.25,dpi:800,factor:1,duration:60,chColor:'#3dff6e',chSize:5,chGap:2,chThick:2,chDot:false,volume:0.5,showPattern:true};
+const S = Object.assign({}, DEFAULTS, loadJSON('aimcs_settings', {}));
+let history = loadJSON('aimcs_history', []);
+const saveSettings = () => saveJSON('aimcs_settings', S);
+
+/* ---------- Modos ---------- */
+const MODES = {
+  gridshot:{name:'Gridshot', tag:'Velocidade', desc:'Três alvos na parede ao mesmo tempo. Destrua o mais rápido possível, com cliques limpos.'},
+  flick:{name:'Flicks amplos', tag:'Flick', desc:'Um alvo por vez em ângulos de até 45°. Treina o movimento de braço e a parada precisa.'},
+  micro:{name:'Microflicks de cabeça', tag:'Mais parecido com CS', desc:'Alvos pequenos, na altura da cabeça e perto da mira. É o ajuste fino que decide o duelo.'},
+  tracking:{name:'Tracking com strafe', tag:'Tracking', desc:'O alvo faz A-D com paradas bruscas, como um inimigo strafando. Mantenha a mira na cabeça.'},
+  spray:{name:'Spray da AK-47', tag:'Controle de recuo', desc:'Segure o clique e puxe o mouse para compensar o recuo. Mantenha os 30 tiros no círculo. O padrão é aproximado.'},
+  senstest:{name:'Teste de sensibilidade', tag:'Diagnóstico', desc:'Três blocos de microflick com sens 0.85×, 1× e 1.15× em ordem secreta. Descubra qual rende mais para você.'}
+};
+
+/* ---------- Three.js ---------- */
+const canvas = $('#game');
+const renderer = new THREE.WebGLRenderer({canvas, antialias:true, powerPreference:'high-performance'});
+renderer.setPixelRatio(Math.min(window.devicePixelRatio||1, 2));
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x0b0f16);
+const camera = new THREE.PerspectiveCamera(CS_VFOV, 1, 0.05, 500);
+camera.rotation.order = 'YXZ';
+function resize(){ renderer.setSize(innerWidth, innerHeight, false); camera.aspect = innerWidth/innerHeight; camera.updateProjectionMatrix(); }
+addEventListener('resize', resize); resize();
+
+function gridTex(base, line, major){
+  const c = document.createElement('canvas'); c.width = c.height = 256; const g = c.getContext('2d');
+  g.fillStyle = base; g.fillRect(0,0,256,256);
+  g.strokeStyle = line; g.lineWidth = 2; g.beginPath(); g.moveTo(128,0); g.lineTo(128,256); g.moveTo(0,128); g.lineTo(256,128); g.stroke();
+  g.strokeStyle = major; g.lineWidth = 4; g.strokeRect(0,0,256,256);
+  const t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.anisotropy = renderer.capabilities.getMaxAnisotropy(); return t;
+}
+const EYE = 1.6;
+const wallTex = gridTex('#141a24','#1b2230','#222b3a'); wallTex.repeat.set(16,6);
+const room = new THREE.Mesh(new THREE.BoxGeometry(80,30,80), new THREE.MeshStandardMaterial({map:wallTex, side:THREE.BackSide, roughness:1}));
+room.position.y = -EYE + 15; scene.add(room);
+const floorTex = gridTex('#10151d','#171e29','#1f2836'); floorTex.repeat.set(40,40);
+const floor = new THREE.Mesh(new THREE.PlaneGeometry(80,80), new THREE.MeshStandardMaterial({map:floorTex, roughness:1}));
+floor.rotation.x = -Math.PI/2; floor.position.y = -EYE + 0.01; scene.add(floor);
+scene.add(new THREE.HemisphereLight(0xd6e6ff, 0x1a1e26, 0.95));
+const dl = new THREE.DirectionalLight(0xffffff, 0.55); dl.position.set(6,12,8); scene.add(dl);
+
+const sphereGeo = new THREE.SphereGeometry(1, 32, 22);
+const targetMat = new THREE.MeshStandardMaterial({color:0x2fd4ff, emissive:0x0a4d66, roughness:0.35, metalness:0.1});
+const onMat = new THREE.MeshStandardMaterial({color:0x3dff8a, emissive:0x0e6a33, roughness:0.35});
+
+/* Bot do tracking */
+const bot = {group:new THREE.Group(), x:0, dir:1, speed:3.4, next:0, stopUntil:0, r:0.4};
+const botHead = new THREE.Mesh(sphereGeo, targetMat); botHead.scale.setScalar(bot.r);
+const botBody = new THREE.Mesh(new THREE.CylinderGeometry(0.34,0.3,1.25,20), new THREE.MeshStandardMaterial({color:0x3a4558, roughness:0.8}));
+botBody.position.y = -1.0;
+bot.group.add(botHead, botBody); bot.group.visible = false; scene.add(bot.group);
+
+/* Parede do spray */
+const AK_RX = [0,0,0.05,-0.05,0.05,0,-0.1,0.1,0.25,0, -0.4,-0.9,-1.4,-1.8,-2.0,-1.8,-1.2,-0.5,0.3,1.0, 1.6,2.0,2.2,2.0,1.6,1.0,0.5,0.2,0.4,0.8];
+const AK_RY = [0,0.3,0.75,1.35,2.05,2.8,3.5,4.1,4.6,5.0, 5.3,5.5,5.65,5.75,5.8,5.85,5.85,5.9,5.9,5.95, 5.95,6.0,6.0,6.05,6.05,6.1,6.1,6.1,6.15,6.15];
+const WALL_Z = -10, CIRCLE_R = 0.35;
+const sprayGroup = new THREE.Group(); sprayGroup.visible = false; scene.add(sprayGroup);
+const sprayWall = new THREE.Mesh(new THREE.PlaneGeometry(8,6), new THREE.MeshStandardMaterial({color:0x1f2632, roughness:0.95}));
+sprayWall.position.set(0,0.5,WALL_Z); sprayGroup.add(sprayWall);
+const circleFill = new THREE.Mesh(new THREE.CircleGeometry(CIRCLE_R,48), new THREE.MeshBasicMaterial({color:0xf5a524, transparent:true, opacity:0.12, depthWrite:false}));
+circleFill.position.set(0,0,WALL_Z+0.01); sprayGroup.add(circleFill);
+const circleRing = new THREE.Mesh(new THREE.RingGeometry(CIRCLE_R-0.02,CIRCLE_R,64), new THREE.MeshBasicMaterial({color:0xf5a524, depthWrite:false}));
+circleRing.position.set(0,0,WALL_Z+0.012); sprayGroup.add(circleRing);
+const centerDot = new THREE.Mesh(new THREE.CircleGeometry(0.025,16), new THREE.MeshBasicMaterial({color:0xf5a524}));
+centerDot.position.set(0,0,WALL_Z+0.013); sprayGroup.add(centerDot);
+const patternGroup = new THREE.Group(); sprayGroup.add(patternGroup);
+const decalGeo = new THREE.CircleGeometry(0.035,12);
+const decalIn = new THREE.MeshBasicMaterial({color:0xffffff, depthWrite:false});
+const decalOut = new THREE.MeshBasicMaterial({color:0xff5468, depthWrite:false});
+const decals = [];
+for(let i=0;i<30;i++){ const d = new THREE.Mesh(decalGeo, decalIn); d.visible=false; d.renderOrder=3; sprayGroup.add(d); decals.push(d); }
+function wallHit(yawD, pitchD){
+  const d = dirFromAngles(yawD, pitchD); if(d.z > -0.01) return null;
+  const t = WALL_Z / d.z; return {x:d.x*t, y:d.y*t};
+}
+(function buildPattern(){
+  const m = new THREE.MeshBasicMaterial({color:0xf5a524, transparent:true, opacity:0.32, depthWrite:false});
+  const g = new THREE.CircleGeometry(0.028,10);
+  for(let i=0;i<30;i++){ const p = wallHit(-AK_RX[i], AK_RY[i]); const dm = new THREE.Mesh(g,m); dm.position.set(p.x,p.y,WALL_Z+0.014); patternGroup.add(dm); }
+})();
+function clearDecals(){ decals.forEach(d=>d.visible=false); }
+
+/* ---------- Matemática da mira ---------- */
+function dirFromAngles(yawD, pitchD){
+  const y = yawD*DEG, p = pitchD*DEG;
+  return new THREE.Vector3(-Math.sin(y)*Math.cos(p), Math.sin(p), -Math.cos(y)*Math.cos(p));
+}
+function aimHitsSphere(dir, pos, r){
+  const d = pos.length(); const c = Math.min(1, dir.dot(pos)/d);
+  return Math.acos(c) <= Math.asin(Math.min(1, r/d));
+}
+
+/* ---------- Áudio ---------- */
+let actx = null, noiseBuf = null;
+function ensureAudio(){
+  try{
+    if(!actx){ actx = new (window.AudioContext||window.webkitAudioContext)();
+      noiseBuf = actx.createBuffer(1, actx.sampleRate*0.12, actx.sampleRate);
+      const ch = noiseBuf.getChannelData(0); for(let i=0;i<ch.length;i++) ch[i] = (Math.random()*2-1)*Math.pow(1-i/ch.length, 2.5);
+    }
+    if(actx.state === 'suspended') actx.resume();
+  }catch(e){}
+}
+function beep(freq, dur, type, vol){
+  if(!actx || S.volume<=0) return;
+  const o = actx.createOscillator(), g = actx.createGain(), t = actx.currentTime;
+  o.type = type; o.frequency.setValueAtTime(freq, t);
+  g.gain.setValueAtTime(vol*S.volume, t); g.gain.exponentialRampToValueAtTime(0.0001, t+dur);
+  o.connect(g); g.connect(actx.destination); o.start(t); o.stop(t+dur+0.02);
+}
+function sndHit(){ beep(1046,0.07,'triangle',0.32); beep(1568,0.09,'sine',0.18); }
+function sndMiss(){ beep(160,0.05,'square',0.05); }
+function sndShot(){
+  if(!actx || S.volume<=0) return;
+  const s = actx.createBufferSource(); s.buffer = noiseBuf; const f = actx.createBiquadFilter(); f.type='lowpass'; f.frequency.value=2200;
+  const g = actx.createGain(); g.gain.value = 0.35*S.volume; s.connect(f); f.connect(g); g.connect(actx.destination); s.start();
+}
+
+/* ---------- Estado ---------- */
+let state = 'menu', resumeState = 'countdown', mode = null;
+let yaw = 0, pitch = 0, locked = false, rawInput = null, curMult = 1;
+let clock = 0, runEnd = 0, countdownEnd = 0, lastKill = 0;
+let stats = null, targets = [], effects = [];
+let blocks = null, blockIdx = 0, blockResults = [];
+let firing = false, sprayIdx = 0, lastShot = -1e9, nextShot = 0, curSpray = null;
+const SENSTEST_BLOCK = 20;
+
+function newStats(){ return {shots:0,hits:0,kills:0,ttks:[],over:0,under:0,onT:0,total:0,sprays:[]}; }
+function blockDuration(){ return mode==='senstest' ? SENSTEST_BLOCK : S.duration; }
+
+/* ---------- Pointer lock ---------- */
+function requestLock(){
+  let p = null;
+  try{ p = canvas.requestPointerLock({unadjustedMovement:true}); }catch(e){ p = null; }
+  if(p && typeof p.then === 'function'){
+    p.then(()=>{ rawInput = true; updateRawBadge(); })
+     .catch(()=>{ rawInput = false; updateRawBadge();
+       try{ const q = canvas.requestPointerLock(); if(q && q.catch) q.catch(lockFail); }catch(e){ lockFail(); } });
+  } else if(p === null){
+    try{ canvas.requestPointerLock(); }catch(e){ lockFail(); }
+  } else { rawInput = false; updateRawBadge(); }
+}
+function lockFail(){
+  if(calib.open){ $('#calStatus').textContent = 'O navegador recusou travar o mouse. Abra a página numa aba própria e tente de novo.'; return; }
+  if(state==='menu'||state==='results') return;
+  state = 'paused';
+  $('#pauseTitle').textContent = 'Não deu para travar o mouse';
+  $('#pauseMsg').textContent = 'O navegador recusou o pointer lock. Abra esta página numa aba própria ou em tela cheia e clique em Continuar.';
+  $('#pause').classList.remove('hidden');
+}
+function updateRawBadge(){
+  const b = $('#rawBadge');
+  if(rawInput === true){ b.textContent = 'Raw input: ativo'; b.className = 'pill ok'; }
+  else if(rawInput === false){ b.textContent = 'Raw input: indisponível neste navegador'; b.className = 'pill warn'; }
+}
+document.addEventListener('pointerlockchange', ()=>{
+  locked = document.pointerLockElement === canvas;
+  if(calib.open){ calib.measuring = false; renderCal(); return; }
+  if(locked){
+    if(state==='paused' || state==='waitlock'){ state = resumeState; $('#pause').classList.add('hidden'); }
+  } else {
+    firing = false;
+    if(state==='playing' || state==='countdown'){
+      resumeState = state; state = 'paused';
+      $('#pauseTitle').textContent = 'Pausado';
+      $('#pauseMsg').textContent = 'Clique em continuar para travar o mouse de novo.';
+      $('#pause').classList.remove('hidden');
+    }
+  }
+});
+document.addEventListener('pointerlockerror', lockFail);
+
+/* ---------- Input ---------- */
+document.addEventListener('mousemove', e=>{
+  if(!locked) return;
+  if(calib.open){
+    if(calib.measuring){ calib.dx += e.movementX; calib.dy += e.movementY; $('#calLive').textContent = Math.round(Math.hypot(calib.dx, calib.dy)); }
+    return;
+  }
+  const k = M_YAW * S.sens * curMult * S.factor;
+  yaw -= e.movementX * k;
+  pitch -= e.movementY * k;
+  if(pitch > 89) pitch = 89; else if(pitch < -89) pitch = -89;
+});
+document.addEventListener('mousedown', e=>{
+  if(calib.open){
+    if(locked && e.button === 0 && calib.samples.length < 3){ calib.measuring = true; calib.dx = 0; calib.dy = 0; $('#calLive').textContent = '0'; renderCal(); }
+    return;
+  }
+  if(!locked || e.button !== 0 || state !== 'playing') return;
+  if(mode === 'spray') startSpray();
+  else if(mode !== 'tracking') shoot();
+});
+document.addEventListener('mouseup', e=>{
+  if(e.button !== 0) return;
+  firing = false;
+  if(calib.open && calib.measuring){
+    calib.measuring = false;
+    const counts = Math.hypot(calib.dx, calib.dy);
+    if(counts > 50) calib.samples.push({counts, cm:calDist()});
+    if(calib.samples.length >= 3){ try{ document.exitPointerLock(); }catch(err){} }
+    renderCal();
+  }
+});
+
+/* ---------- Medição de DPI ---------- */
+const calib = {open:false, measuring:false, dx:0, dy:0, samples:[]};
+const COMMON_DPI = [400,450,500,600,800,1000,1200,1500,1600,1800,2000,2400,3000,3200,3600,4000,4800,5000,6400,8000,12000,16000];
+function calDist(){ const v = $('#calRef').value; return v === 'custom' ? parseFloat($('#calCustom').value) || 10 : parseFloat(v); }
+const sampleDpi = s => s.counts / (s.cm/2.54);
+function openCal(){ calib.open = true; calib.measuring = false; calib.samples = []; $('#calLive').textContent = '0'; $('#dpiCal').classList.remove('hidden'); renderCal(); }
+function closeCal(){
+  calib.open = false; calib.measuring = false;
+  try{ if(document.pointerLockElement) document.exitPointerLock(); }catch(e){}
+  $('#dpiCal').classList.add('hidden');
+}
+function renderCal(){
+  const n = calib.samples.length;
+  let st;
+  if(n >= 3) st = 'Pronto! Veja o resultado abaixo.';
+  else if(!locked) st = n ? `Mouse destravado. Clique em Começar medição para fazer a medição ${n+1} de 3.` : 'Clique em Começar medição para travar o mouse.';
+  else if(calib.measuring) st = 'Arrastando… solte o botão no fim da referência.';
+  else st = `Medição ${n+1} de 3: posicione o mouse no início, segure o botão esquerdo e arraste.`;
+  $('#calStatus').textContent = st;
+  $('#calLockBtn').textContent = n >= 3 ? 'Medir de novo' : 'Começar medição';
+  $('#calSamples').innerHTML = calib.samples.map((s,i)=>`<span class="pill">Medição ${i+1}: <b style="color:var(--text)">${Math.round(sampleDpi(s))}</b> DPI</span>`).join('');
+  let html = '';
+  if(n >= 1){
+    const vals = calib.samples.map(sampleDpi), mean = avg(vals);
+    const spread = n > 1 ? (Math.max(...vals) - Math.min(...vals)) / mean : 0;
+    let snap = COMMON_DPI.reduce((a,b)=> Math.abs(b-mean) < Math.abs(a-mean) ? b : a);
+    const close = Math.abs(snap-mean)/mean <= 0.08;
+    const useVal = close ? snap : Math.round(mean/50)*50;
+    if(n >= 3){
+      html += `<div class="note" style="margin-top:14px">Média medida: <b>${Math.round(mean)} DPI</b>. `;
+      html += close ? `Isso bate com o valor de fábrica comum de <b>${snap} DPI</b>, que deve ser o estágio em que o seu mouse está agora.` : `Não ficou perto de um valor comum de fábrica. Use a média arredondada, <b>${useVal}</b>.`;
+      if(spread > 0.1) html += ` <br><span style="color:var(--bad)">As medições variaram ${Math.round(spread*100)}%.</span> Vale recomeçar, arrastando mais reto e parando exatamente no fim da referência.`;
+      html += `<br><br>Se você apertar o botão de DPI do mouse, o valor muda. Lembre de deixar no mesmo estágio que você usa no CS.</div>`;
+      html += `<div class="row" style="margin-top:12px"><button class="btn" id="calUseBtn">Usar ${useVal} DPI</button></div>`;
+    }
+    if(rawInput === false) html += `<div class="note" style="margin-top:10px">Seu navegador não liberou o raw input. A velocidade do ponteiro do Windows e a opção "Aumentar precisão do ponteiro" podem distorcer a medição. No Chrome ou no Edge ela fica exata.</div>`;
+  }
+  $('#calResult').innerHTML = html;
+  const ub = $('#calUseBtn');
+  if(ub){ const v = parseInt(ub.textContent.replace(/\D/g,''),10); ub.addEventListener('click', ()=>{ S.dpi = v; $('#sDpi').value = v; saveSettings(); updateDerived(); closeCal(); }); }
+}
+
+/* ---------- Alvos ---------- */
+function makeTarget(yD, pD, dist, r, extra){
+  const pos = dirFromAngles(yD, pD).multiplyScalar(dist);
+  const m = new THREE.Mesh(sphereGeo, targetMat); m.scale.setScalar(0.001); m.position.copy(pos); scene.add(m);
+  const t = Object.assign({mesh:m, pos, r, tYaw:yD, tPitch:pD, sYaw:yaw, sPitch:pitch, born:clock}, extra||{});
+  targets.push(t); return t;
+}
+function removeTarget(t){ scene.remove(t.mesh); targets.splice(targets.indexOf(t),1); }
+function clearTargets(){ targets.slice().forEach(removeTarget); }
+
+const GRID_Y = [-12,-6,0,6,12], GRID_P = [-5,1,7];
+function spawnGrid(exclude){
+  const used = new Set(targets.map(t=>t.cell)); const free = [];
+  for(let i=0;i<15;i++) if(!used.has(i) && i!==exclude) free.push(i);
+  const c = free[Math.floor(Math.random()*free.length)];
+  makeTarget(GRID_Y[c%5], GRID_P[Math.floor(c/5)], 14, 0.55, {cell:c});
+}
+function spawnFlick(){
+  let y, p, n = 0;
+  do{ y = rand(-45,45); p = rand(-6,14); n++; }
+  while(n < 30 && Math.hypot(wrap(y-yaw), p-pitch) < 14);
+  makeTarget(y, p, 16, 0.48);
+}
+function spawnMicro(){
+  const wy = wrap(yaw); const off = rand(2.5, 12); let s = Math.random()<0.5 ? -1 : 1;
+  let y = wy + s*off; if(Math.abs(y) > 35) y = wy - s*off;
+  makeTarget(y, rand(-1.4, 2.0), rand(14,22), 0.2);
+}
+function spawnNext(exclude){
+  if(mode==='gridshot') spawnGrid(exclude);
+  else if(mode==='flick') spawnFlick();
+  else spawnMicro();
+}
+function spawnInitial(){
+  if(mode==='gridshot'){ spawnGrid(); spawnGrid(); spawnGrid(); }
+  else if(mode==='flick' || mode==='micro' || mode==='senstest') spawnNext();
+}
+
+function hitFx(pos, r){
+  const m = new THREE.Mesh(sphereGeo, new THREE.MeshBasicMaterial({color:0x9ff0ff, transparent:true, opacity:0.6, depthWrite:false}));
+  m.position.copy(pos); m.scale.setScalar(r); scene.add(m); effects.push({m, r, t:0});
+}
+function flashHitmarker(){ const h = $('#hitmarker'); h.classList.remove('show'); void h.getBoundingClientRect(); h.classList.add('show'); }
+
+function shoot(){
+  stats.shots++;
+  const d = dirFromAngles(yaw, pitch);
+  let hit = null;
+  for(const t of targets){ if(aimHitsSphere(d, t.pos, t.r)){ hit = t; break; } }
+  if(hit){
+    stats.hits++; stats.kills++;
+    stats.ttks.push(mode==='gridshot' ? clock - lastKill : clock - hit.born);
+    lastKill = clock;
+    hitFx(hit.pos, hit.r); sndHit(); flashHitmarker();
+    const cell = hit.cell; removeTarget(hit); spawnNext(cell);
+  } else {
+    sndMiss();
+    if(targets.length === 1 && mode !== 'gridshot'){
+      const t = targets[0];
+      const ax = wrap(t.tYaw - t.sYaw), ay = t.tPitch - t.sPitch;
+      const cx = wrap(yaw - t.sYaw),  cy = pitch - t.sPitch;
+      const L2 = ax*ax + ay*ay;
+      if(L2 > 2.25){ const proj = (cx*ax + cy*ay)/L2; if(proj > 1) stats.over++; else stats.under++; }
+    }
+  }
+}
+
+/* ---------- Spray ---------- */
+function startSpray(){
+  if(sprayIdx >= 30 && clock - lastShot <= 350) return;
+  if(!curSpray){ clearDecals(); curSpray = {shots:0, inC:0}; sprayIdx = 0; }
+  firing = true; nextShot = Math.max(clock, lastShot + 100);
+}
+function fireBullet(){
+  const i = sprayIdx++;
+  const by = yaw - AK_RX[i] + (Math.random()-0.5)*0.12;
+  const bp = pitch + AK_RY[i] + (Math.random()-0.5)*0.12;
+  stats.shots++; curSpray.shots++; sndShot();
+  const p = wallHit(by, bp);
+  if(p && Math.abs(p.x) < 4 && p.y > -2.5 && p.y < 3.5){
+    const inC = Math.hypot(p.x, p.y) <= CIRCLE_R;
+    const dm = decals[i]; dm.material = inC ? decalIn : decalOut; dm.position.set(p.x, p.y, WALL_Z+0.02); dm.visible = true;
+    if(inC){ stats.hits++; curSpray.inC++; }
+  }
+}
+function finalizeSpray(){
+  if(curSpray && curSpray.shots >= 10) stats.sprays.push(curSpray.inC / curSpray.shots);
+  curSpray = null; sprayIdx = 0;
+}
+function updateSpray(){
+  if(firing){
+    while(clock >= nextShot && sprayIdx < 30){ fireBullet(); lastShot = nextShot; nextShot += 100; }
+    if(sprayIdx >= 30) firing = false;
+  } else if(curSpray && clock - lastShot > 350){ finalizeSpray(); }
+}
+
+/* ---------- Tracking ---------- */
+function updateBot(dt){
+  if(clock >= bot.next){
+    if(Math.random() < 0.25) bot.stopUntil = clock + rand(120, 320);
+    if(Math.random() < 0.8) bot.dir = -bot.dir;
+    bot.next = clock + rand(250, 900);
+  }
+  const v = clock < bot.stopUntil ? 0 : bot.dir * bot.speed;
+  bot.x += v*dt;
+  if(bot.x > 5){ bot.x = 5; bot.dir = -1; } else if(bot.x < -5){ bot.x = -5; bot.dir = 1; }
+  bot.group.position.set(bot.x, 0, -12);
+  const on = aimHitsSphere(dirFromAngles(yaw,pitch), bot.group.position, bot.r);
+  stats.total += dt; if(on) stats.onT += dt;
+  botHead.material = on ? onMat : targetMat;
+}
+
+/* ---------- Fluxo da rodada ---------- */
+function startMode(m){
+  mode = m; ensureAudio();
+  ['#menu','#results','#pause'].forEach(s=>$(s).classList.add('hidden'));
+  yaw = 0; pitch = 0; clock = 0;
+  if(m === 'senstest'){ blocks = [0.85,1,1.15].sort(()=>Math.random()-0.5); blockIdx = 0; blockResults = []; }
+  else blocks = null;
+  beginBlock();
+  $('#hud').style.display = 'block'; $('#xhair').style.display = 'block';
+  state = 'waitlock'; resumeState = 'countdown';
+  requestLock();
+}
+function beginBlock(){
+  stats = newStats(); clearTargets(); clearDecals();
+  curMult = blocks ? blocks[blockIdx] : 1;
+  firing = false; sprayIdx = 0; lastShot = -1e9; curSpray = null;
+  bot.x = 0; bot.dir = 1; bot.next = 0; bot.stopUntil = 0;
+  sprayGroup.visible = mode === 'spray';
+  patternGroup.visible = S.showPattern;
+  bot.group.visible = mode === 'tracking';
+  $('#hudAmmo').classList.toggle('hidden', mode !== 'spray');
+  countdownEnd = clock + (blocks && blockIdx > 0 ? 2500 : 3000);
+  const bl = blocks ? ` · Bloco <b>${blockIdx+1}/3</b> (sens oculta)` : ` · Sens <b>${S.sens}</b>`;
+  $('#hudBottom').innerHTML = `<b>${MODES[mode].name}</b>${bl} · Esc para pausar`;
+  $('#hScoreK').textContent = mode==='tracking' ? 'Na mira' : mode==='spray' ? 'No círculo' : 'Abates';
+  $('#hAccK').textContent = mode==='tracking' ? 'Duração' : 'Precisão';
+}
+function endBlock(){
+  firing = false;
+  if(mode === 'spray') finalizeSpray();
+  clearTargets();
+  if(blocks){
+    blockResults.push(Object.assign({mult:curMult}, summarize()));
+    blockIdx++;
+    if(blockIdx < blocks.length){ beginBlock(); state = 'countdown'; return; }
+  }
+  finishRun();
+}
+function summarize(){
+  const acc = stats.shots ? stats.hits/stats.shots : 0;
+  const ttk = avg(stats.ttks);
+  if(mode === 'tracking'){
+    const pct = stats.total ? stats.onT/stats.total : 0;
+    return {score: Math.round(pct*1000)/10, display: (pct*100).toFixed(1)+'%', lines:[
+      ['Tempo na mira', (pct*100).toFixed(1)+'%'], ['Segundos na mira', stats.onT.toFixed(1)+' s'], ['Duração', Math.round(stats.total)+' s']]};
+  }
+  if(mode === 'spray'){
+    const sp = avg(stats.sprays);
+    const best = stats.sprays.length ? Math.max(...stats.sprays) : 0;
+    return {score: Math.round(sp*1000)/10, display: (sp*100).toFixed(1)+'%', lines:[
+      ['Média por spray', (sp*100).toFixed(1)+'%'], ['Melhor spray', (best*100).toFixed(0)+'%'],
+      ['Sprays (10+ tiros)', stats.sprays.length], ['Tiros no círculo', stats.hits+' / '+stats.shots]]};
+  }
+  const score = Math.round(stats.kills*100*acc);
+  return {score, display: score.toLocaleString('pt-BR'), acc, ttk, over:stats.over, under:stats.under, kills:stats.kills, lines:[
+    ['Abates', stats.kills], ['Precisão', (acc*100).toFixed(1)+'%'],
+    ['Tempo médio/alvo', ttk ? Math.round(ttk)+' ms' : '—'], ['Overflick / Underflick', stats.over+' / '+stats.under]]};
+}
+function finishRun(){
+  state = 'results';
+  try{ document.exitPointerLock(); }catch(e){}
+  $('#hud').style.display = 'none'; $('#xhair').style.display = 'none'; $('#countdown').classList.add('hidden');
+  sprayGroup.visible = false; bot.group.visible = false; clearTargets();
+  const R = $('#results'); R.classList.remove('hidden');
+  $('#rMode').textContent = MODES[mode].name;
+  $('#rExtra').innerHTML = '';
+  if(mode === 'senstest'){ renderSensResults(); return; }
+  const sum = summarize();
+  $('#rScore').textContent = sum.display;
+  $('#rStats').innerHTML = sum.lines.map(([k,v])=>`<div><div class="k">${k}</div><div class="v">${v}</div></div>`).join('');
+  const prevBest = bestFor(mode);
+  $('#rBest').innerHTML = prevBest === null ? '<span class="pill ok">Primeiro resultado neste modo</span>'
+    : sum.score > prevBest.score ? `<span class="pill ok">Novo recorde! Anterior: ${prevBest.display}</span>`
+    : `<span class="pill">Recorde: ${prevBest.display}</span>`;
+  if(sum.over !== undefined && sum.over + sum.under >= 5){
+    const tip = sum.over > sum.under*1.5 ? 'Você passa do alvo com frequência (overflick). Pode ser sens alta ou braço rápido demais no fim do movimento.'
+      : sum.under > sum.over*1.5 ? 'Você para antes do alvo com frequência (underflick). Pode ser sens baixa ou falta de confiança no movimento.'
+      : 'Overflicks e underflicks estão equilibrados, sem tendência clara.';
+    $('#rExtra').innerHTML = `<div class="note">${tip}</div>`;
+  }
+  if(mode === 'spray') $('#rExtra').innerHTML = `<div class="note">Os tiros brancos caíram dentro do círculo; os vermelhos, fora. O padrão da AK sobe nas primeiras ~9 balas (puxe para baixo), depois vai para a esquerda (puxe para a direita) e depois para a direita. Este padrão é uma aproximação do jogo.</div>`;
+  pushHistory(mode, sum.score, sum.display);
+}
+function renderSensResults(){
+  const rows = blockResults.slice().sort((a,b)=>a.mult-b.mult);
+  const best = rows.reduce((a,b)=> b.score > a.score ? b : a, rows[0]);
+  $('#rScore').textContent = (S.sens*best.mult).toFixed(2);
+  $('#rBest').innerHTML = `<span class="pill ok">Melhor desempenho com ${best.mult}× da sua sens</span>`;
+  $('#rStats').innerHTML = '';
+  let html = '<table><tr><th>Multiplicador</th><th>Sens CS2</th><th>cm/360</th><th>Pontos</th><th>Precisão</th><th>Tempo/alvo</th><th>Over/Under</th></tr>';
+  rows.forEach(r=>{
+    const cls = r === best ? ' class="best"' : '';
+    html += `<tr${cls}><td>${r.mult}×</td><td>${(S.sens*r.mult).toFixed(2)}</td><td>${cm360(S.sens*r.mult).toFixed(1)}</td><td>${r.score}</td><td>${(r.acc*100).toFixed(1)}%</td><td>${r.ttk?Math.round(r.ttk)+' ms':'—'}</td><td>${r.over}/${r.under}</td></tr>`;
+  });
+  html += '</table>';
+  const base = rows.find(r=>r.mult===1);
+  let tip = best.mult === 1 ? 'Sua sens atual teve o melhor resultado. Não há motivo para mudar agora.'
+    : `Você foi melhor com ${(S.sens*best.mult).toFixed(2)}. Faça o teste mais 2 ou 3 vezes antes de mudar: um único teste tem muito ruído.`;
+  if(base && base.over + base.under >= 5){
+    if(base.over > base.under*1.5) tip += ' Na sua sens atual você tende a passar do alvo, o que costuma indicar sens alta.';
+    else if(base.under > base.over*1.5) tip += ' Na sua sens atual você tende a parar antes do alvo, o que costuma indicar sens baixa.';
+  }
+  $('#rExtra').innerHTML = html + `<div class="note">${tip}</div>`;
+  pushHistory('senstest', best.mult, `melhor: ${(S.sens*best.mult).toFixed(2)} (${best.mult}×)`, true);
+}
+
+/* ---------- Histórico ---------- */
+function bestFor(m){
+  let b = null; history.forEach(h=>{ if(h.mode===m && !h.noBest && (b===null || h.score > b.score)) b = h; }); return b;
+}
+function pushHistory(m, score, display, noBest){
+  history.unshift({mode:m, score, display, sens:S.sens, date:Date.now(), noBest:!!noBest});
+  history = history.slice(0, 60); saveJSON('aimcs_history', history); renderHistory();
+}
+function renderHistory(){
+  const el = $('#history');
+  if(!history.length){ el.innerHTML = '<p class="hint">Nenhuma rodada ainda. Seus resultados e recordes aparecem aqui.</p>'; return; }
+  const bests = Object.keys(MODES).filter(m=>m!=='senstest').map(m=>[m,bestFor(m)]).filter(x=>x[1]);
+  let h = '';
+  if(bests.length) h += '<div class="row" style="margin-bottom:10px">' + bests.map(([m,b])=>`<span class="pill">${MODES[m].name}: <b style="color:var(--text)">${b.display}</b></span>`).join('') + '</div>';
+  h += '<table><tr><th>Quando</th><th>Modo</th><th>Resultado</th><th>Sens</th></tr>';
+  history.slice(0,8).forEach(x=>{
+    const d = new Date(x.date);
+    h += `<tr><td>${d.toLocaleDateString('pt-BR')} ${d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}</td><td>${MODES[x.mode]?MODES[x.mode].name:x.mode}</td><td>${x.display}</td><td>${x.sens}</td></tr>`;
+  });
+  el.innerHTML = h + '</table>';
+}
+
+/* ---------- Menu / UI ---------- */
+function cm360(sens){ return 360/(M_YAW*sens) / S.dpi * 2.54; }
+function updateDerived(){
+  $('#dEdpi').textContent = Math.round(S.sens*S.dpi);
+  $('#dCm').textContent = cm360(S.sens).toFixed(1);
+}
+function drawCrosshair(cv){
+  const g = cv.getContext('2d'), W = cv.width, c = Math.floor(W/2);
+  g.clearRect(0,0,W,W);
+  const s = S.chSize*2, gap = S.chGap*2+2, th = S.chThick;
+  const rects = [[c-Math.floor(th/2), c-gap-s, th, s],[c-Math.floor(th/2), c+gap, th, s],[c-gap-s, c-Math.floor(th/2), s, th],[c+gap, c-Math.floor(th/2), s, th]];
+  if(S.chDot) rects.push([c-Math.floor(th/2), c-Math.floor(th/2), th, th]);
+  g.fillStyle = 'rgba(0,0,0,0.9)'; rects.forEach(r=>g.fillRect(r[0]-1,r[1]-1,r[2]+2,r[3]+2));
+  g.fillStyle = S.chColor; rects.forEach(r=>g.fillRect(r[0],r[1],r[2],r[3]));
+}
+function showMenu(){
+  state = 'menu'; mode = null; curMult = 1;
+  try{ if(document.pointerLockElement) document.exitPointerLock(); }catch(e){}
+  ['#results','#pause'].forEach(s=>$(s).classList.add('hidden'));
+  $('#menu').classList.remove('hidden');
+  $('#hud').style.display = 'none'; $('#xhair').style.display = 'none'; $('#countdown').classList.add('hidden');
+  clearTargets(); sprayGroup.visible = false; bot.group.visible = false;
+  renderHistory();
+}
+function initUI(){
+  $('#modes').innerHTML = Object.entries(MODES).map(([k,m])=>
+    `<button class="mode" data-mode="${k}"><div class="tag">${m.tag}</div><div class="t">${m.name}</div><div class="d">${m.desc}</div><div class="b">Jogar →</div></button>`).join('');
+  document.querySelectorAll('.mode').forEach(b=>b.addEventListener('click', ()=>startMode(b.dataset.mode)));
+  const bind = (id, key, parse, evt) => { const el = $(id);
+    if(el.type === 'checkbox') el.checked = S[key]; else el.value = S[key];
+    el.addEventListener(evt||'input', ()=>{ const v = el.type==='checkbox' ? el.checked : parse(el.value);
+      if(el.type!=='checkbox' && (isNaN(v) || v<=0) && key!=='chGap') return;
+      S[key] = v; saveSettings(); updateDerived(); drawCrosshair($('#xhair')); drawCrosshair($('#xprev')); }); };
+  bind('#sSens','sens',parseFloat); bind('#sDpi','dpi',parseFloat); bind('#sFac','factor',parseFloat);
+  bind('#sDur','duration',v=>parseInt(v,10),'change'); bind('#sVol','volume',parseFloat); bind('#sPat','showPattern',null,'change');
+  bind('#cSize','chSize',v=>parseInt(v,10)); bind('#cGap','chGap',v=>parseInt(v,10)); bind('#cThick','chThick',v=>parseInt(v,10)); bind('#cDot','chDot',null,'change');
+  $('#sVol').value = S.volume;
+  const colors = ['#3dff6e','#2fd4ff','#ffe347','#ffffff','#ff4fd8','#ff5468'];
+  const sw = $('#swatches');
+  sw.innerHTML = colors.map(c=>`<div class="sw${c===S.chColor?' on':''}" data-c="${c}" style="background:${c}"></div>`).join('');
+  sw.querySelectorAll('.sw').forEach(el=>el.addEventListener('click', ()=>{
+    S.chColor = el.dataset.c; saveSettings(); sw.querySelectorAll('.sw').forEach(x=>x.classList.toggle('on', x===el));
+    drawCrosshair($('#xhair')); drawCrosshair($('#xprev')); }));
+  $('#fsBtn').addEventListener('click', ()=>{ try{ const p = document.documentElement.requestFullscreen(); if(p&&p.catch) p.catch(()=>{}); }catch(e){} });
+  $('#calOpenBtn').addEventListener('click', openCal);
+  $('#calCloseBtn').addEventListener('click', closeCal);
+  $('#calResetBtn').addEventListener('click', ()=>{ calib.samples = []; calib.measuring = false; $('#calLive').textContent = '0'; renderCal(); });
+  $('#calLockBtn').addEventListener('click', ()=>{ if(calib.samples.length >= 3){ calib.samples = []; $('#calLive').textContent = '0'; } requestLock(); renderCal(); });
+  $('#calRef').addEventListener('change', ()=>{ $('#calCustomRow').classList.toggle('hidden', $('#calRef').value !== 'custom'); });
+  $('#resumeBtn').addEventListener('click', ()=>{ ensureAudio(); requestLock(); });
+  $('#quitBtn').addEventListener('click', showMenu);
+  $('#againBtn').addEventListener('click', ()=>startMode(mode));
+  $('#menuBtn').addEventListener('click', showMenu);
+  updateDerived(); drawCrosshair($('#xhair')); drawCrosshair($('#xprev')); renderHistory();
+}
+
+/* ---------- Loop ---------- */
+let lastT = performance.now(), fpsAcc = 0, fpsN = 0, fpsT = 0;
+function updateHUD(){
+  const cd = $('#countdown');
+  if(state === 'countdown'){
+    const left = Math.max(0, countdownEnd - clock);
+    cd.classList.remove('hidden');
+    cd.innerHTML = Math.ceil(left/1000) + (blocks ? `<small>BLOCO ${blockIdx+1} DE 3</small>` : '');
+    $('#hTime').textContent = blockDuration().toFixed(1);
+  } else cd.classList.add('hidden');
+  if(state !== 'playing') return;
+  $('#hTime').textContent = Math.max(0, (runEnd-clock)/1000).toFixed(1);
+  if(mode === 'tracking'){
+    $('#hScore').textContent = stats.total ? (stats.onT/stats.total*100).toFixed(1)+'%' : '—';
+    $('#hAcc').textContent = Math.round(stats.total)+'s';
+  } else if(mode === 'spray'){
+    $('#hScore').textContent = stats.shots ? (stats.hits/stats.shots*100).toFixed(0)+'%' : '—';
+    $('#hAcc').textContent = stats.sprays.length ? (avg(stats.sprays)*100).toFixed(0)+'%' : '—';
+    const ammo = 30 - sprayIdx;
+    $('#hudAmmo').innerHTML = (curSpray || sprayIdx ? ammo : 30) + '<small>/30</small>';
+  } else {
+    $('#hScore').textContent = stats.kills;
+    $('#hAcc').textContent = stats.shots ? (stats.hits/stats.shots*100).toFixed(0)+'%' : '—';
+  }
+}
+function loop(t){
+  requestAnimationFrame(loop);
+  const dt = Math.min(0.1, (t - lastT)/1000); lastT = t;
+  fpsAcc += dt; fpsN++; if(t - fpsT > 500){ $('#hudFps').textContent = Math.round(fpsN/fpsAcc)+' fps'; fpsAcc = 0; fpsN = 0; fpsT = t; }
+
+  if(state === 'menu' || state === 'results'){ yaw += dt*4; pitch = 4; }
+  if(state === 'countdown' || state === 'playing'){
+    clock += dt*1000;
+    if(state === 'countdown' && clock >= countdownEnd){
+      state = 'playing'; runEnd = clock + blockDuration()*1000; lastKill = clock; spawnInitial();
+    }
+    if(state === 'playing'){
+      if(mode === 'tracking') updateBot(dt);
+      if(mode === 'spray') updateSpray();
+      if(clock >= runEnd) endBlock();
+    }
+  }
+  for(const tg of targets){ const k = Math.min(1, (clock - tg.born)/90); tg.mesh.scale.setScalar(tg.r*(0.3+0.7*k)); }
+  for(let i=effects.length-1;i>=0;i--){
+    const e = effects[i]; e.t += dt;
+    const k = e.t/0.22; e.m.scale.setScalar(e.r*(1+k*1.6)); e.m.material.opacity = 0.6*(1-k);
+    if(k >= 1){ scene.remove(e.m); e.m.material.dispose(); effects.splice(i,1); }
+  }
+  updateHUD();
+  camera.rotation.set(pitch*DEG, yaw*DEG, 0);
+  renderer.render(scene, camera);
+}
+
+initUI();
+requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>
