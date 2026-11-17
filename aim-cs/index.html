@@ -17,7 +17,7 @@
   --accent:#f5a524; --accent2:#2fd4ff; --good:#3dff8a; --bad:#ff5468;
 }
 *{box-sizing:border-box}
-html,body{margin:0;height:100%;background:#000;color:var(--text);font-family:Inter,system-ui,sans-serif;overflow:hidden}
+html,body{margin:0;height:100%;overscroll-behavior:none;background:#000;color:var(--text);font-family:Inter,system-ui,sans-serif;overflow:hidden}
 #game{position:fixed;top:0;left:0;display:block}
 #xhair{position:fixed;left:50%;top:50%;width:160px;height:160px;transform:translate(-50%,-50%);pointer-events:none;z-index:5;display:none}
 #hitmarker{position:fixed;left:50%;top:50%;width:34px;height:34px;transform:translate(-50%,-50%);pointer-events:none;z-index:6;opacity:0}
@@ -118,6 +118,53 @@ th{color:var(--muted);font-weight:500;font-size:11.5px;text-transform:uppercase;
 .lg i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px;vertical-align:0}
 #chartTip{position:absolute;pointer-events:none;background:#0b0f16;border:1px solid var(--line);border-radius:8px;padding:6px 9px;font-size:12px;line-height:1.4;white-space:nowrap;transform:translate(-50%,-115%);display:none}
 #chartTip b{font-family:Rajdhani,Inter,sans-serif;font-size:16px}
+/* ---------- Mobile ---------- */
+body.is-mobile .pc-only{display:none!important}
+body:not(.is-mobile) .mobile-only{display:none!important}
+body.playing{touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+.overlay>.card,.overlay>.wrap{margin:auto}
+#mbtns{position:fixed;inset:0;pointer-events:none;z-index:8;display:none}
+body.is-mobile.playing #mbtns,#mbtns.edit{display:block}
+.mbtn{position:absolute;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
+  background:rgba(18,24,35,.42);border:2px solid rgba(230,235,242,.55);color:#fff;font:600 10px Inter,sans-serif;letter-spacing:.08em;
+  text-transform:uppercase;transition:transform .06s,background .06s;-webkit-tap-highlight-color:transparent}
+.mbtn svg{width:42%;height:42%}
+.mbtn.on{background:rgba(245,165,36,.55);border-color:#f5a524;transform:scale(.94)}
+.mbtn.cool{opacity:.45}
+.mbtn.off{display:none}
+#mbtns.edit{pointer-events:auto;background:rgba(6,9,14,.35)}
+#mbtns.edit .mbtn{touch-action:none;cursor:grab;border-style:dashed}
+#mbtns.edit .mbtn.sel{border-color:#f5a524;border-style:solid;box-shadow:0 0 0 4px rgba(245,165,36,.25)}
+#mPause{position:absolute;left:12px;top:12px;width:44px;height:44px;border-radius:10px;background:rgba(10,14,20,.7);border:1px solid rgba(255,255,255,.15);
+  display:flex;align-items:center;justify-content:center;color:#fff;font:700 16px Inter,sans-serif}
+#mbtns.edit #mPause{display:none}
+#scope{position:fixed;inset:0;pointer-events:none;z-index:3;
+  background:radial-gradient(circle at 50% 50%, transparent 0, transparent 40vmin, rgba(0,0,0,.92) 40.4vmin, #000 100%)}
+#scope::before,#scope::after{content:"";position:absolute;background:rgba(0,0,0,.85)}
+#scope::before{left:50%;top:10vh;bottom:10vh;width:1.5px;transform:translateX(-50%)}
+#scope::after{top:50%;left:calc(50% - 40vmin);right:calc(50% - 40vmin);height:1.5px;transform:translateY(-50%)}
+#scopeDot{position:fixed;left:50%;top:50%;width:6px;height:6px;margin:-3px 0 0 -3px;border-radius:50%;background:#ff3b3b;z-index:3;pointer-events:none}
+#rotateHint{display:none;position:fixed;inset:0;z-index:30;background:#0b0f16;color:var(--text);align-items:center;justify-content:center;
+  flex-direction:column;gap:12px;text-align:center;padding:24px;font-size:16px}
+#rotateHint .ic{font-size:54px;line-height:1;color:var(--accent);font-family:Rajdhani,Inter,sans-serif;font-weight:700}
+@media (orientation: portrait){ body.is-mobile.playing #rotateHint{display:flex} }
+#calHud{position:fixed;left:10px;top:10px;z-index:12;width:min(300px,calc(100vw - 20px));background:rgba(12,16,24,.88);border:1px solid var(--line);
+  border-radius:12px;padding:12px;font-size:12.5px;line-height:1.45;max-height:calc(100vh - 20px);overflow:auto}
+#calHud b{font-family:Rajdhani,Inter,sans-serif;font-size:18px;letter-spacing:.04em}
+#calHud input[type=range]{flex:1;accent-color:var(--accent)}
+#calHud input[type=number]{width:64px;background:var(--panel2);border:1px solid var(--line);color:var(--text);border-radius:7px;padding:5px 7px;font:inherit}
+#chLive{margin:8px 0;padding:8px;border-radius:8px;background:var(--panel2);font-family:Rajdhani,Inter,sans-serif;font-size:17px;font-weight:600}
+#layoutBar{position:fixed;left:50%;bottom:10px;transform:translateX(-50%);z-index:12;width:min(560px,calc(100vw - 20px));background:rgba(12,16,24,.92);
+  border:1px solid var(--line);border-radius:12px;padding:10px 12px;font-size:12.5px}
+#layoutBar input[type=range]{accent-color:var(--accent);width:140px}
+.mrow{display:flex;align-items:center;gap:8px;margin:6px 0}
+.mrow label{color:var(--muted);flex:1;font-size:13px}
+.mrow input[type=number]{width:70px;background:var(--panel2);border:1px solid var(--line);color:var(--text);border-radius:7px;padding:7px 8px;font:inherit}
+.mrow .unit{color:var(--muted);font-size:12px;width:12px}
+body.is-mobile #hudBottom{left:66px}
+@media (max-width:700px){ .overlay{padding:10px} .logo{font-size:34px} .big{font-size:56px} }
+@media (max-height:500px){ #calHud{font-size:11.5px;padding:9px} #calHud .hint{font-size:11px} #chLive{font-size:15px;margin:6px 0} .hbox{padding:3px 10px;min-width:74px} .hbox .v{font-size:20px} .hbox .k{font-size:9px} #hudTop{top:8px}
+  #countdown{font-size:80px} #countdown small{font-size:15px} #hudBottom{font-size:12px;bottom:8px;left:66px} #hudPrompt{font-size:16px} }
 </style>
 </head>
 <body>
@@ -138,6 +185,29 @@ th{color:var(--muted);font-weight:500;font-size:11.5px;text-transform:uppercase;
   <div id="hudPrompt"></div>
 </div>
 <div id="countdown" class="hidden"></div>
+<div id="scope" class="hidden"></div><div id="scopeDot" class="hidden"></div>
+<div id="mbtns">
+  <div id="mPause">II</div>
+  <div class="mbtn" id="m_fireL" data-b="fireL"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2" fill="currentColor"/></svg>Tiro</div>
+  <div class="mbtn" id="m_ads" data-b="ads"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="8"/><path d="M12 2v6M12 16v6M2 12h6M16 12h6"/></svg>Mira</div>
+  <div class="mbtn" id="m_fire" data-b="fire"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2" fill="currentColor"/></svg>Tiro</div>
+</div>
+<div id="rotateHint"><div class="ic">⟳</div><div>Gire o celular para a horizontal para jogar.</div></div>
+<div id="calHud" class="hidden ui-pass">
+  <b id="chTitle">Calibrar</b>
+  <p class="hint" id="chHelp" style="margin:4px 0 8px"></p>
+  <div class="row" style="gap:8px;flex-wrap:nowrap"><input type="range" id="chRange" min="15" max="600" step="1"><input type="number" id="chNum" min="15" max="600" step="1"><span class="hint" style="margin:0">%</span></div>
+  <div id="chLive">Arraste o dedo na tela para testar</div>
+  <div class="row"><button class="btn sm ghost" id="chZero">Voltar ao 0°</button><button class="btn sm ghost" id="chCancel">Cancelar</button><button class="btn sm" id="chDone">Salvar</button></div>
+</div>
+<div id="layoutBar" class="hidden ui-pass">
+  <div style="margin-bottom:4px"><b>Editar botões</b> <span class="hint">Arraste cada botão para onde ele fica no seu jogo. Toque num botão para mudar o tamanho.</span></div>
+  <div class="row" style="gap:12px">
+    <span class="hint" style="margin:0">Tamanho de <b id="lbSel">Tiro</b></span><input type="range" id="lbSize" min="44" max="150" step="2">
+    <label class="hint" style="margin:0;display:flex;gap:6px;align-items:center"><input type="checkbox" id="lbFireL"> Tiro esquerdo</label>
+  </div>
+  <div class="row" style="margin-top:8px"><button class="btn sm ghost" id="lbReset">Restaurar padrão</button><button class="btn sm" id="lbDone">Concluir</button></div>
+</div>
 
 <!-- MENU -->
 <div id="menu" class="overlay">
@@ -145,18 +215,42 @@ th{color:var(--muted);font-weight:500;font-size:11.5px;text-transform:uppercase;
     <header class="top">
       <div>
         <div class="logo">AIM<span>//</span>CS</div>
-        <div class="sub">Treino de mira com a sensibilidade exata do CS2 (m_yaw 0.022 · FOV vertical 73.74°)</div>
+        <div class="sub pc-only">Treino de mira com a sensibilidade exata do CS2 (m_yaw 0.022 · FOV vertical 73.74°)</div>
+        <div class="sub mobile-only">Treino de mira no celular para Fortnite e CoD Mobile</div>
       </div>
       <div class="row">
-        <span class="pill" id="rawBadge">Raw input: testado ao iniciar</span>
+        <select id="sDevice" class="btn ghost sm" style="padding:7px 10px" title="Tipo de controle"><option value="auto">Detectar aparelho</option><option value="pc">PC (mouse)</option><option value="mobile">Celular (toque)</option></select>
+        <span class="pill pc-only" id="rawBadge">Raw input: testado ao iniciar</span>
         <button class="btn ghost sm hidden" id="installBtn">Instalar app</button>
         <button class="btn ghost sm" id="fsBtn">Tela cheia</button>
       </div>
     </header>
     <div class="grid">
       <div class="col">
+        <div class="card mobile-only">
+          <h3>Perfil mobile</h3>
+          <div class="field"><label for="mGame">Jogo</label><select id="mGame"><option value="fortnite">Fortnite</option><option value="cod">CoD Mobile</option></select></div>
+          <p class="hint">Cada jogo guarda seus próprios valores de sensibilidade e FOV.</p>
+          <h4>Sensibilidade do toque</h4>
+          <p class="hint" style="margin-bottom:6px">Quanto da largura da tela você arrasta para girar 180°. Calibre cada uma comparando com o jogo.</p>
+          <div class="mrow"><label for="mSensGeral">Sem mira</label><input type="number" id="mSensGeral" min="15" max="600" step="1"><span class="unit">%</span><button class="btn ghost sm" data-cal="geral">Calibrar</button></div>
+          <div class="mrow"><label for="mSensMira">Mirando (ADS)</label><input type="number" id="mSensMira" min="15" max="600" step="1"><span class="unit">%</span><button class="btn ghost sm" data-cal="mira">Calibrar</button></div>
+          <div class="mrow"><label for="mSensLuneta">Luneta / sniper</label><input type="number" id="mSensLuneta" min="15" max="900" step="1"><span class="unit">%</span><button class="btn ghost sm" data-cal="luneta">Calibrar</button></div>
+          <div class="field"><label for="mFov">FOV horizontal</label><div class="row" style="gap:6px"><input type="range" id="mFov" min="60" max="110" step="1"><span class="val" id="vFov"></span></div></div>
+          <h4>Controles</h4>
+          <button class="btn ghost sm" id="mLayoutBtn" style="width:100%">Editar posição e tamanho dos botões</button>
+          <div class="field"><label for="mFireRel">Sniper atira ao soltar o dedo</label><input type="checkbox" id="mFireRel"></div>
+          <div class="field"><label for="mAutoFs">Tela cheia ao começar</label><input type="checkbox" id="mAutoFs"></div>
+          <h4>Giroscópio</h4>
+          <div class="field"><label for="mGyro">Usar giroscópio</label><select id="mGyro"><option value="off">Desligado</option><option value="always">Sempre</option><option value="ads">Só mirando</option></select></div>
+          <div class="field"><label for="mGyroSens">Sensibilidade do giro</label><div class="row" style="gap:6px"><input type="range" id="mGyroSens" min="0.2" max="4" step="0.05"><span class="val" id="vGyro"></span></div></div>
+          <div class="field"><label for="mGyroX">Inverter horizontal</label><input type="checkbox" id="mGyroX"></div>
+          <div class="field"><label for="mGyroY">Inverter vertical</label><input type="checkbox" id="mGyroY"></div>
+          <p class="hint" id="mGyroMsg">Com 1,0, girar o celular 10° gira a mira 10°. No iPhone, o sistema pede permissão na primeira vez.</p>
+        </div>
         <div class="card">
-          <h3>Sua configuração</h3>
+          <h3 class="pc-only">Sua configuração</h3><h3 class="mobile-only">Configurações gerais</h3>
+          <div class="pc-only">
           <div class="field"><label for="sSens">Sensibilidade (CS2)</label><input type="number" id="sSens" step="0.01" min="0.05" max="20"></div>
           <div class="field"><label for="sDpi">DPI do mouse</label><input type="number" id="sDpi" step="50" min="100" max="32000"></div>
           <button class="btn ghost sm" id="calOpenBtn" style="width:100%">Não sabe seu DPI? Medir agora</button>
@@ -165,14 +259,16 @@ th{color:var(--muted);font-weight:500;font-size:11.5px;text-transform:uppercase;
             <div><div class="k">cm / 360°</div><div class="v" id="dCm">—</div></div>
           </div>
           <p class="hint">O giro aqui fica igual ao do CS2 se você usar a mesma sens e deixar o botão de DPI do mouse no mesmo estágio do jogo. O DPI só serve para calcular o cm/360.</p>
+          </div>
 
-          <h4>Jogo</h4>
+          <h4 class="pc-only">Jogo</h4>
           <div class="field"><label for="sDur">Duração da rodada</label><select id="sDur"><option value="30">30 s</option><option value="60">60 s</option><option value="90">90 s</option></select></div>
           <div class="field"><label for="sWarm">Duração do aquecimento</label><select id="sWarm"><option value="5">5 min</option><option value="10">10 min</option><option value="15">15 min</option></select></div>
-          <div class="field"><label for="sAspect">Proporção da tela</label><select id="sAspect"><option value="native">Nativa</option><option value="stretched">4:3 esticado</option><option value="black">4:3 com barras</option></select></div>
+          <div class="field pc-only"><label for="sAspect">Proporção da tela</label><select id="sAspect"><option value="native">Nativa</option><option value="stretched">4:3 esticado</option><option value="black">4:3 com barras</option></select></div>
           <div class="field"><label for="sMark">Marcar tiros errados</label><input type="checkbox" id="sMark"></div>
           <div class="field"><label for="sVol">Volume</label><input type="range" id="sVol" min="0" max="1" step="0.05"></div>
 
+          <div class="pc-only">
           <h4>Spray</h4>
           <div class="field"><label for="sWeapon">Arma</label><select id="sWeapon"></select></div>
           <div class="field"><label for="sPat">Mostrar padrão na parede</label><input type="checkbox" id="sPat"></div>
@@ -181,6 +277,7 @@ th{color:var(--muted);font-weight:500;font-size:11.5px;text-transform:uppercase;
           <h4>Avançado</h4>
           <div class="field"><label for="sFac">Fator de correção do input</label><input type="number" id="sFac" step="0.01" min="0.1" max="5"></div>
           <p class="hint">Deixe em 1. Mude só se girar 360° aqui exigir uma distância diferente da do CS no seu navegador.</p>
+          </div>
         </div>
 
         <div class="card">
@@ -199,7 +296,7 @@ th{color:var(--muted);font-weight:500;font-size:11.5px;text-transform:uppercase;
           <p class="hint">Mesmos valores do CS2 (cl_crosshairsize, gap, thickness). A prévia mostra o tamanho em 1080p.</p>
         </div>
 
-        <div class="card">
+        <div class="card pc-only">
           <h3>Conversor de sens</h3>
           <div class="field"><label for="cvGame">Jogo</label><select id="cvGame"></select></div>
           <div class="field"><label for="cvSens">Sens nesse jogo</label><input type="number" id="cvSens" step="0.01" min="0.01" value="0.4"></div>
@@ -217,7 +314,8 @@ th{color:var(--muted);font-weight:500;font-size:11.5px;text-transform:uppercase;
         <div class="card">
           <h3>Modos de treino</h3>
           <div class="modes" id="modes"></div>
-          <p class="hint" style="margin-top:12px">Clique num modo para travar o mouse e começar. <b>Esc</b> pausa. Funciona melhor no Chrome ou Edge, que suportam raw input.</p>
+          <p class="hint pc-only" style="margin-top:12px">Clique num modo para travar o mouse e começar. <b>Esc</b> pausa. Funciona melhor no Chrome ou Edge, que suportam raw input.</p>
+          <p class="hint mobile-only" style="margin-top:12px">Jogue com o celular na horizontal. Arraste o dedo em qualquer lugar da tela para mirar; dá para arrastar segurando o botão de tiro, como nos jogos. O botão <b>II</b> pausa.</p>
         </div>
         <div class="card">
           <div class="row" style="justify-content:space-between;margin-bottom:8px">
@@ -316,11 +414,28 @@ const esc = s => String(s).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&
 function loadJSON(k,d){ try{ const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; }catch(e){ return d; } }
 function saveJSON(k,v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} }
 const DEFAULTS = {sens:1.25,dpi:800,factor:1,duration:60,warmup:10,aspect:'native',volume:0.5,markMiss:true,showPattern:true,aimPunch:true,weapon:'ak47',
-  cvGame:'valorant',
+  cvGame:'valorant', device:'auto',
+  mobile:{game:'fortnite', gyro:'off', gyroSens:1, gyroInvX:false, gyroInvY:false, fireRelease:false, autoFs:true,
+    profiles:{fortnite:{hfov:80, geral:70, mira:110, luneta:260}, cod:{hfov:80, geral:70, mira:110, luneta:260}},
+    layout:{fire:{x:0.86,y:0.66,s:88}, fireL:{x:0.11,y:0.42,s:72,on:true}, ads:{x:0.93,y:0.36,s:64}}},
   xh:{size:2.5,gap:-1.5,thick:1,outline:true,outlineThick:1,dot:false,tstyle:false,color:1,r:50,g:250,b:50,alpha:255,alphaEn:true}};
 const saved = loadJSON('aimcs_settings', {});
 const S = Object.assign({}, DEFAULTS, saved);
 S.xh = Object.assign({}, DEFAULTS.xh, saved.xh || {});
+(function mergeMobile(){
+  const sm = saved.mobile || {}, D = DEFAULTS.mobile;
+  S.mobile = Object.assign({}, D, sm);
+  S.mobile.profiles = {}; for(const g in D.profiles) S.mobile.profiles[g] = Object.assign({}, D.profiles[g], (sm.profiles||{})[g] || {});
+  S.mobile.layout = {}; for(const b in D.layout) S.mobile.layout[b] = Object.assign({}, D.layout[b], (sm.layout||{})[b] || {});
+})();
+function isMobile(){
+  if(S.device === 'mobile') return true; if(S.device === 'pc') return false;
+  try{ return matchMedia('(pointer: coarse)').matches && !matchMedia('(pointer: fine)').matches; }catch(e){ return 'ontouchstart' in window; }
+}
+const prof = () => S.mobile.profiles[S.mobile.game] || S.mobile.profiles.fortnite;
+const MGAMES = {fortnite:'Fortnite', cod:'CoD Mobile'};
+const PROFILE_NAMES = {geral:'Sem mira', mira:'Mirando (ADS)', luneta:'Luneta / sniper'};
+const ZOOM = {geral:1, mira:1.5, luneta:4};
 let history = loadJSON('aimcs_history', []);
 const saveSettings = () => saveJSON('aimcs_settings', S);
 
@@ -363,17 +478,19 @@ const GAMES = {
 
 /* ---------- Modos ---------- */
 const MODES = {
-  warmup:{name:'Aquecimento', tag:'Rotina', desc:'Antes de jogar: tracking, microflicks, flicks e spray em sequência, com um resumo no final. A duração muda nas configurações.', featured:true},
-  micro:{name:'Microflicks de cabeça', tag:'Mais parecido com CS', desc:'Alvos pequenos, na altura da cabeça e perto da mira. É o ajuste fino que decide o duelo.'},
-  preaim:{name:'Pre-aim', tag:'Posicionamento', desc:'Inimigos dão peek nas quinas por menos de um segundo. Treina deixar a mira na altura da cabeça, onde ele vai aparecer.', isNew:true},
-  strafe:{name:'Counter-strafe', tag:'Movimento', desc:'Ande com WASD e pare com a tecla oposta antes de atirar. Tiro andando sai impreciso, como no CS.', isNew:true},
+  warmup:{name:'Aquecimento', tag:'Rotina', desc:'Antes de jogar: tracking, microflicks, flicks e spray em sequência, com um resumo no final. A duração muda nas configurações.',
+    descM:'Antes de jogar: tracking, microflicks, flicks e sniper em sequência, com um resumo no final. A duração muda nas configurações.', featured:true},
+  micro:{name:'Microflicks de cabeça', tag:'Mais parecido com CS', tagM:'Ajuste fino', desc:'Alvos pequenos, na altura da cabeça e perto da mira. É o ajuste fino que decide o duelo.'},
+  sniper:{name:'Sniper com luneta', tag:'Luneta', desc:'Inimigos longe, parados ou andando. Use o botão de mira para abrir a luneta e acerte a cabeça antes que ele saia.', only:'mobile', isNew:true},
+  preaim:{name:'Pre-aim', tag:'Posicionamento', desc:'Inimigos dão peek nas quinas por menos de um segundo. Treina deixar a mira na altura da cabeça, onde ele vai aparecer.'},
+  strafe:{name:'Counter-strafe', tag:'Movimento', desc:'Ande com WASD e pare com a tecla oposta antes de atirar. Tiro andando sai impreciso, como no CS.', only:'pc'},
   tracking:{name:'Tracking com strafe', tag:'Tracking', desc:'O bot faz A-D com paradas bruscas. Conta separado o tempo na cabeça e no corpo.'},
   flick:{name:'Flicks amplos', tag:'Flick', desc:'Um alvo por vez em ângulos de até 45°. Treina o movimento de braço e a parada precisa.'},
   gridshot:{name:'Gridshot', tag:'Velocidade', desc:'Três alvos na parede ao mesmo tempo. Destrua o mais rápido possível, com cliques limpos.'},
-  spray:{name:'Controle de spray', tag:'Recuo', desc:'AK-47, M4A4, M4A1-S, Galil ou FAMAS, com pulo de tela. Mantenha os tiros no círculo. Padrões aproximados.'},
+  spray:{name:'Controle de spray', tag:'Recuo', desc:'AK-47, M4A4, M4A1-S, Galil ou FAMAS, com pulo de tela. Mantenha os tiros no círculo. Padrões aproximados.', only:'pc'},
   senstest:{name:'Teste de sensibilidade', tag:'Diagnóstico', desc:'Três blocos de microflick com 0.85×, 1× e 1.15× da sua sens, em ordem secreta. Mostra qual rende mais.'}
 };
-const modeLabel = (m, v) => m==='spray' && v && WEAPONS[v] ? `Spray ${WEAPONS[v].name}` : (MODES[m] ? MODES[m].name : m);
+const modeLabel = (m, v) => m==='spray' && v && WEAPONS[v] ? `Spray ${WEAPONS[v].name}` : (MODES[m] ? MODES[m].name : m) + (v === 'mobile' ? ' (celular)' : '');
 
 /* ---------- Three.js ---------- */
 const canvas = $('#game');
@@ -386,11 +503,26 @@ camera.rotation.order = 'YXZ';
 let xhScaleX = 1;
 function applyAspect(){
   const W = innerWidth, H = innerHeight; let cw = W, asp = W/H; xhScaleX = 1;
-  if(S.aspect === 'stretched'){ asp = 4/3; xhScaleX = (W/H)/(4/3); }
-  else if(S.aspect === 'black'){ cw = Math.min(W, Math.round(H*4/3)); asp = cw/H; }
+  if(!isMobile()){
+    if(S.aspect === 'stretched'){ asp = 4/3; xhScaleX = (W/H)/(4/3); }
+    else if(S.aspect === 'black'){ cw = Math.min(W, Math.round(H*4/3)); asp = cw/H; }
+  }
   canvas.style.width = cw+'px'; canvas.style.height = H+'px'; canvas.style.left = Math.round((W-cw)/2)+'px';
-  renderer.setSize(cw, H, false); camera.aspect = asp; camera.updateProjectionMatrix();
+  renderer.setSize(cw, H, false); camera.aspect = asp; updateFov();
   drawCrosshairs();
+  if(typeof positionButtons === 'function') positionButtons();
+}
+let ads = false, calibProfile = 'geral';
+function currentZoom(){
+  if(state === 'calib') return ZOOM[calibProfile];
+  return ads ? (mode === 'sniper' ? ZOOM.luneta : ZOOM.mira) : 1;
+}
+function updateFov(){
+  if(isMobile()){
+    const h = prof().hfov*DEG/2, z = currentZoom();
+    camera.fov = 2*Math.atan(Math.tan(h)/z/camera.aspect)/DEG;
+  } else camera.fov = CS_VFOV;
+  camera.updateProjectionMatrix();
 }
 addEventListener('resize', applyAspect);
 
@@ -428,6 +560,7 @@ function makeBot(headMat, bMat){
 const trackBot = makeBot(targetMat, bodyMat);
 const preBot = makeBot(enemyHeadMat, enemyBodyMat);
 const strafeBot = makeBot(enemyHeadMat, enemyBodyMat);
+const sniperBot = makeBot(enemyHeadMat, enemyBodyMat);
 
 /* Parede do spray */
 const WALL_Z = -10, CIRCLE_R = 0.35;
@@ -569,7 +702,7 @@ let promptText = '', promptColor = '', promptUntil = 0;
 const SENSTEST_BLOCK = 20;
 
 function newStats(){ return {shots:0,hits:0,kills:0,heads:0,bodies:0,escaped:0,ttks:[],over:0,under:0,
-  headT:0,bodyT:0,total:0,sprays:[],still:0,stopTimes:[],placeErr:[],vertErr:[],reaction:[],points:0,shotMap:[]}; }
+  headT:0,bodyT:0,total:0,sprays:[],still:0,stopTimes:[],placeErr:[],vertErr:[],reaction:[],points:0,shotMap:[],hip:0}; }
 const curBlock = () => run.plan[run.idx];
 
 /* ---------- Pointer lock ---------- */
@@ -954,6 +1087,241 @@ function shootStrafe(){
   }
 }
 
+/* ---------- Sniper (mobile) ---------- */
+const sn = {active:false, born:0, next:0, walk:0, off:0, base:new THREE.Vector3(), right:new THREE.Vector3(), cooldownUntil:0};
+const SN_TIMEOUT = 4500, SN_BOLT = 900;
+function spawnSniper(){
+  const y = rand(-35, 35), d = rand(22, 36);
+  sn.base = dirFromAngles(y, 0).multiplyScalar(d).setY(0.02);
+  sn.right = new THREE.Vector3(Math.cos(y*DEG), 0, -Math.sin(y*DEG));
+  sn.walk = Math.random() < 0.45 ? (Math.random() < 0.5 ? -1 : 1)*1.4 : 0; sn.off = 0;
+  sniperBot.position.copy(sn.base); sniperBot.visible = true; sn.active = true; sn.born = clock;
+}
+function updateSniper(dt){
+  if(!sn.active){ if(clock >= sn.next) spawnSniper(); return; }
+  if(sn.walk){ sn.off += sn.walk*dt; if(Math.abs(sn.off) > 2.5){ sn.off = Math.sign(sn.off)*2.5; sn.walk = -sn.walk; } sniperBot.position.copy(sn.base).addScaledVector(sn.right, sn.off); }
+  if(clock - sn.born > SN_TIMEOUT){ stats.escaped++; sn.active = false; sniperBot.visible = false; sn.next = clock + 600; flashPrompt('Escapou', '#ff5468', 500); }
+}
+function shootSniper(){
+  if(clock < sn.cooldownUntil) return;
+  sn.cooldownUntil = clock + SN_BOLT; stats.shots++; sndShot();
+  if(!ads) stats.hip++;
+  const spread = ads ? 0.02 : 3.5, ang = Math.random()*Math.PI*2, r = Math.sqrt(Math.random())*spread;
+  const dir = dirFromAngles(yaw + Math.cos(ang)*r, pitch + Math.sin(ang)*r);
+  if(!ads) flashPrompt('Sem luneta o tiro sai disperso', '#f5a524', 700);
+  if(!sn.active){ markImpact(dir); return; }
+  const {head, body} = sniperBot.userData;
+  const obj = rayFirst(dir, [head, body]);
+  recordShot(dir, head.getWorldPosition(new THREE.Vector3()), 0.22, obj === head ? 'hit' : obj ? 'body' : 'miss');
+  if(!obj){ markImpact(dir); sndMiss(); return; }
+  const ttk = clock - sn.born, isHead = obj === head;
+  stats.hits++; stats.kills++; stats.ttks.push(ttk);
+  if(isHead){ stats.heads++; stats.points += 100 + Math.round(Math.max(0, 2500 - ttk)/25); sndHead(); }
+  else { stats.bodies++; stats.points += 40; sndHit(); }
+  flashHitmarker(isHead); hitFx(head.getWorldPosition(new THREE.Vector3()), 0.22);
+  sn.active = false; sniperBot.visible = false; sn.next = clock + rand(400, 900);
+}
+
+/* ---------- Toque (mobile) ---------- */
+const touches = new Map();
+function touchProfile(){ return state === 'calib' ? calibProfile : (ads ? (mode === 'sniper' ? 'luneta' : 'mira') : 'geral'); }
+function touchDegPerPx(){ return 180 / (prof()[touchProfile()]/100 * innerWidth); }
+function inGameTouch(){ return isMobile() && (state === 'playing' || state === 'countdown' || state === 'calib'); }
+function btnAt(x, y){
+  if(state === 'calib') return null;
+  const pr = $('#mPause').getBoundingClientRect();
+  if(x >= pr.left-10 && x <= pr.right+10 && y >= pr.top-10 && y <= pr.bottom+10) return 'pause';
+  const L = S.mobile.layout, W = innerWidth, H = innerHeight;
+  for(const k of ['ads','fire','fireL']){
+    const b = L[k]; if(k === 'fireL' && !b.on) continue;
+    if(Math.hypot(x - b.x*W, y - b.y*H) <= b.s/2*1.15) return k;
+  }
+  return null;
+}
+function pressFx(k, on){ const el = $('#m_'+k); if(el) el.classList.toggle('on', on); }
+function mobileFire(){
+  if(state !== 'playing') return;
+  if(mode === 'sniper') shootSniper();
+  else if(mode === 'preaim') shootPreaim();
+  else if(mode !== 'tracking') shoot();
+}
+function rotateBy(dYaw, dPitch){ yaw += dYaw; pitch += dPitch; if(pitch > 89) pitch = 89; else if(pitch < -89) pitch = -89; }
+document.addEventListener('touchstart', e=>{
+  if(e.target.closest && e.target.closest('.ui-pass')) return;
+  if(!inGameTouch()) return;
+  e.preventDefault(); ensureAudio();
+  for(const t of e.changedTouches){
+    const role = btnAt(t.clientX, t.clientY) || 'aim';
+    touches.set(t.identifier, {role, x:t.clientX, y:t.clientY, sx:t.clientX, syaw:yaw});
+    if(role === 'pause'){ pauseGame(); return; }
+    if(role === 'ads'){ setAds(!ads); pressFx('ads', ads); }
+    if(role === 'fire' || role === 'fireL'){ pressFx(role, true); if(!(S.mobile.fireRelease && mode === 'sniper')) mobileFire(); }
+  }
+}, {passive:false});
+document.addEventListener('touchmove', e=>{
+  if(!touches.size || !inGameTouch()) return;
+  e.preventDefault();
+  const k = touchDegPerPx()*curMult;
+  for(const t of e.changedTouches){
+    const o = touches.get(t.identifier); if(!o) continue;
+    if(o.role === 'aim' || o.role === 'fire' || o.role === 'fireL') rotateBy(-(t.clientX - o.x)*k, -(t.clientY - o.y)*k);
+    o.x = t.clientX; o.y = t.clientY;
+    if(state === 'calib' && o.role === 'aim') calibLive(o);
+  }
+}, {passive:false});
+function touchEnd(e){
+  for(const t of e.changedTouches){
+    const o = touches.get(t.identifier); if(!o) continue;
+    touches.delete(t.identifier);
+    if(o.role === 'fire' || o.role === 'fireL'){ pressFx(o.role, false); if(S.mobile.fireRelease && mode === 'sniper' && inGameTouch()) mobileFire(); }
+  }
+}
+document.addEventListener('touchend', touchEnd, {passive:false});
+document.addEventListener('touchcancel', touchEnd, {passive:false});
+function setAds(v){
+  ads = !!v; updateFov();
+  const scoped = ads && mode === 'sniper' && state !== 'calib';
+  $('#scope').classList.toggle('hidden', !scoped); $('#scopeDot').classList.toggle('hidden', !scoped);
+  $('#xhair').style.visibility = scoped ? 'hidden' : 'visible';
+  pressFx('ads', ads);
+}
+function positionButtons(){
+  const L = S.mobile.layout, W = innerWidth, H = innerHeight;
+  for(const k of ['fire','fireL','ads']){
+    const el = $('#m_'+k), b = L[k]; if(!el) continue;
+    el.style.width = el.style.height = b.s+'px';
+    el.style.left = (b.x*W - b.s/2)+'px'; el.style.top = (b.y*H - b.s/2)+'px';
+    el.classList.toggle('off', k === 'fireL' && !b.on);
+  }
+}
+
+/* ---------- Giroscópio ---------- */
+let gyroLast = performance.now();
+function gyroActive(){
+  const g = S.mobile.gyro;
+  return isMobile() && (g === 'always' || (g === 'ads' && ads)) && (state === 'playing' || state === 'countdown' || state === 'calib');
+}
+function requestGyroPermission(){
+  try{
+    if(S.mobile.gyro !== 'off' && window.DeviceMotionEvent && typeof DeviceMotionEvent.requestPermission === 'function'){
+      DeviceMotionEvent.requestPermission().then(r=>{ if(r !== 'granted') $('#mGyroMsg').textContent = 'O iPhone negou acesso ao giroscópio. Libere em Ajustes > Safari > Movimento e orientação.'; }).catch(()=>{});
+    }
+  }catch(e){}
+}
+addEventListener('devicemotion', e=>{
+  const now = performance.now(), dt = Math.min(0.05, (now - gyroLast)/1000); gyroLast = now;
+  if(!gyroActive() || !e.rotationRate) return;
+  const r = e.rotationRate;
+  let ang = 0; try{ ang = (screen.orientation && typeof screen.orientation.angle === 'number') ? screen.orientation.angle : (window.orientation || 0); }catch(err){}
+  let yr, pr;
+  if(ang === 90){ yr = r.beta; pr = r.gamma; }
+  else if(ang === 270 || ang === -90){ yr = -r.beta; pr = -r.gamma; }
+  else { yr = r.gamma; pr = -r.beta; }
+  const sens = S.mobile.gyroSens / currentZoom();
+  rotateBy((yr||0)*dt*sens*(S.mobile.gyroInvX?-1:1), (pr||0)*dt*sens*(S.mobile.gyroInvY?-1:1));
+});
+
+/* ---------- Calibração de 180° (mobile) ---------- */
+const calGroup = new THREE.Group(); calGroup.visible = false; scene.add(calGroup);
+function makeLabel(text, color){
+  const c = document.createElement('canvas'); c.width = 256; c.height = 128; const g = c.getContext('2d');
+  g.font = 'bold 76px Rajdhani, Inter, sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillStyle = color; g.fillText(text, 128, 64);
+  const sp = new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(c), depthWrite:false})); sp.scale.set(2.6, 1.3, 1); return sp;
+}
+for(let a=0; a<360; a+=45){
+  const turn = a <= 180 ? a : 360 - a;
+  const col = turn === 180 ? 0xf5a524 : turn === 0 ? 0x2fd4ff : 0x55657d;
+  const p = dirFromAngles(a, 0).multiplyScalar(16);
+  const pil = new THREE.Mesh(new THREE.BoxGeometry(0.35, 4, 0.35), new THREE.MeshStandardMaterial({color:col, emissive:col, emissiveIntensity:0.25}));
+  pil.position.set(p.x, 0.4, p.z); calGroup.add(pil);
+  const lb = makeLabel(turn+'°', turn === 180 ? '#f5a524' : '#e6ebf2'); lb.position.set(p.x, 3.1, p.z); calGroup.add(lb);
+}
+let calibPrev = 0;
+function openCalib(profile){
+  calibProfile = profile; calibPrev = prof()[profile];
+  state = 'calib'; yaw = 0; pitch = 0; requestGyroPermission(); enterFullscreen();
+  $('#menu').classList.add('hidden'); $('#calHud').classList.remove('hidden');
+  calGroup.visible = true; setPlaying(true); $('#mbtns').style.display = 'none';
+  $('#xhair').style.display = 'block'; $('#xhair').style.visibility = 'visible';
+  $('#chTitle').textContent = `Calibrar: ${PROFILE_NAMES[profile]} · ${MGAMES[S.mobile.game]}`;
+  $('#chHelp').innerHTML = (profile === 'geral' ? 'No jogo, sem mirar' : profile === 'mira' ? 'No jogo, mirando (segurando o botão de mira)' : 'No jogo, com a luneta da sniper aberta') +
+    ': encoste o dedo na borda esquerda da tela e arraste para a direita até ficar de costas (180°). Veja até onde o dedo chegou: meio da tela = 50%, a tela toda = 100%. Coloque esse número abaixo e faça o mesmo arraste aqui para conferir.';
+  $('#chRange').value = calibPrev; $('#chNum').value = calibPrev;
+  $('#chLive').textContent = 'Arraste o dedo na tela para testar'; updateFov();
+}
+function setCalibValue(v){ v = Math.max(15, Math.min(900, Math.round(v))); prof()[calibProfile] = v; $('#chRange').value = v; $('#chNum').value = v; }
+function calibLive(o){
+  const turned = Math.abs(o.syaw - yaw), drag = Math.abs(o.x - o.sx)/innerWidth*100;
+  $('#chLive').textContent = `Arrastou ${drag.toFixed(0)}% da tela → girou ${turned.toFixed(0)}°`;
+}
+function closeCalib(save){
+  if(!save) prof()[calibProfile] = calibPrev;
+  saveSettings(); syncMobileUI();
+  calGroup.visible = false; $('#calHud').classList.add('hidden'); touches.clear();
+  showMenu();
+}
+
+/* ---------- Editor de botões (mobile) ---------- */
+const LAYOUT_NAMES = {fire:'Tiro', fireL:'Tiro esquerdo', ads:'Mira'};
+let layoutSel = 'fire', layoutDrag = null;
+function openLayout(){
+  state = 'layout'; $('#menu').classList.add('hidden');
+  $('#mbtns').classList.add('edit'); $('#layoutBar').classList.remove('hidden');
+  enterFullscreen(); positionButtons(); selectLayoutBtn('fire');
+  $('#lbFireL').checked = S.mobile.layout.fireL.on;
+}
+function selectLayoutBtn(k){
+  layoutSel = k; document.querySelectorAll('#mbtns .mbtn').forEach(el=>el.classList.toggle('sel', el.dataset.b === k));
+  $('#lbSel').textContent = LAYOUT_NAMES[k]; $('#lbSize').value = S.mobile.layout[k].s;
+}
+function closeLayout(){
+  $('#mbtns').classList.remove('edit'); $('#layoutBar').classList.add('hidden');
+  document.querySelectorAll('#mbtns .mbtn').forEach(el=>el.classList.remove('sel'));
+  saveSettings(); showMenu();
+}
+document.querySelectorAll('#mbtns .mbtn').forEach(el=>{
+  el.addEventListener('pointerdown', e=>{
+    if(state !== 'layout') return;
+    e.preventDefault(); selectLayoutBtn(el.dataset.b);
+    const b = S.mobile.layout[el.dataset.b];
+    layoutDrag = {k:el.dataset.b, id:e.pointerId, ox:e.clientX - b.x*innerWidth, oy:e.clientY - b.y*innerHeight};
+    try{ el.setPointerCapture(e.pointerId); }catch(err){}
+  });
+  el.addEventListener('pointermove', e=>{
+    if(!layoutDrag || layoutDrag.id !== e.pointerId) return;
+    const b = S.mobile.layout[layoutDrag.k];
+    b.x = Math.max(0.03, Math.min(0.97, (e.clientX - layoutDrag.ox)/innerWidth));
+    b.y = Math.max(0.05, Math.min(0.95, (e.clientY - layoutDrag.oy)/innerHeight));
+    positionButtons();
+  });
+  const end = ()=>{ if(layoutDrag){ layoutDrag = null; saveSettings(); } };
+  el.addEventListener('pointerup', end); el.addEventListener('pointercancel', end);
+});
+
+/* ---------- Pausa, tela cheia ---------- */
+function setPlaying(on){ document.body.classList.toggle('playing', !!on); if(on) positionButtons(); $('#mbtns').style.display = ''; }
+function enterFullscreen(){
+  if(!isMobile() || !S.mobile.autoFs) return;
+  try{
+    const el = document.documentElement;
+    if(!document.fullscreenElement && el.requestFullscreen){
+      const p = el.requestFullscreen({navigationUI:'hide'});
+      const lock = ()=>{ try{ const q = screen.orientation && screen.orientation.lock && screen.orientation.lock('landscape'); if(q && q.catch) q.catch(()=>{}); }catch(e){} };
+      if(p && p.then) p.then(lock).catch(()=>{}); else lock();
+    }
+  }catch(e){}
+}
+function pauseGame(msg){
+  if(!(state === 'playing' || state === 'countdown')) return;
+  resumeState = state; state = 'paused'; firing = false; touches.clear();
+  ['fire','fireL'].forEach(k=>pressFx(k, false));
+  $('#pauseTitle').textContent = 'Pausado';
+  $('#pauseMsg').textContent = msg || (isMobile() ? 'Toque em Continuar quando estiver pronto.' : 'Clique em continuar para travar o mouse de novo.');
+  $('#pause').classList.remove('hidden');
+  if(!isMobile()){ try{ if(document.pointerLockElement) document.exitPointerLock(); }catch(e){} }
+}
+document.addEventListener('visibilitychange', ()=>{ if(document.hidden) pauseGame(); });
+
 /* ---------- Fluxo ---------- */
 function startRun(kind){
   ensureAudio();
@@ -961,21 +1329,28 @@ function startRun(kind){
   if(kind === 'senstest') plan = [0.85,1,1.15].sort(()=>Math.random()-0.5).map((m,i)=>({mode:'micro', dur:SENSTEST_BLOCK, mult:m, label:`Bloco ${i+1} de 3`}));
   else if(kind === 'warmup'){
     const f = S.warmup/10;
-    plan = [['tracking',120],['micro',180],['flick',120],['spray',180]].map(([m,s],i)=>({mode:m, dur:Math.round(s*f), mult:1, label:`Etapa ${i+1} de 4 · ${modeLabel(m, m==='spray'?S.weapon:null)}`}));
+    const last = isMobile() ? 'sniper' : 'spray';
+    plan = [['tracking',120],['micro',180],['flick',120],[last,180]].map(([m,s],i)=>({mode:m, dur:Math.round(s*f), mult:1, label:`Etapa ${i+1} de 4 · ${modeLabel(m, m==='spray'?S.weapon:null)}`}));
   } else plan = [{mode:kind, dur:S.duration, mult:1}];
   run = {kind, plan, idx:0, results:[]};
   ['#menu','#results','#pause'].forEach(s=>$(s).classList.add('hidden'));
   yaw = 0; pitch = 0; clock = 0;
   beginBlock();
   $('#hud').style.display = 'block'; $('#xhair').style.display = 'block';
-  state = 'waitlock'; resumeState = 'countdown';
-  requestLock();
+  if(isMobile()){
+    state = 'countdown'; resumeState = 'countdown';
+    setPlaying(true); enterFullscreen(); requestGyroPermission();
+    if(innerHeight > innerWidth) pauseGame('Gire o celular para a horizontal e toque em Continuar.');
+  } else {
+    state = 'waitlock'; resumeState = 'countdown';
+    requestLock();
+  }
 }
 function setSceneFor(m){
   sprayGroup.visible = m === 'spray';
   trackBot.visible = m === 'tracking';
   preGroup.visible = m === 'preaim';
-  preBot.visible = false; strafeBot.visible = false;
+  preBot.visible = false; strafeBot.visible = false; sniperBot.visible = false;
   $('#hudAmmo').classList.toggle('hidden', m !== 'spray');
   $('#hudSpeed').classList.toggle('hidden', m !== 'strafe');
 }
@@ -985,17 +1360,18 @@ function beginBlock(){
   firing = false; sprayIdx = 0; lastShot = -1e9; curSpray = null; punch.x = punch.y = 0;
   bot.x = 0; bot.dir = 1; bot.next = 0; bot.stopUntil = 0;
   eye.set(0,0,0); mv.vx = mv.vz = mv.speed = 0; mv.armed = false; mv.brakeStart = null; moveAcc = 0; strafe.target = false;
-  setSceneFor(mode);
+  sn.active = false; sn.next = 0; sn.cooldownUntil = 0; touches.clear();
+  setSceneFor(mode); setAds(false);
   if(mode === 'spray'){ buildPattern(); patternGroup.visible = S.showPattern; }
   if(mode === 'preaim') buildPreaim();
   countdownEnd = clock + (run.idx > 0 ? 3000 : 3000);
   let info;
   if(run.kind === 'senstest') info = ` · ${b.label} (sens oculta)`;
   else if(run.kind === 'warmup') info = ` · Aquecimento ${run.idx+1}/${run.plan.length}`;
-  else info = ` · Sens <b>${S.sens}</b>`;
+  else info = isMobile() ? ` · ${MGAMES[S.mobile.game]}` : ` · Sens <b>${S.sens}</b>`;
   const extra = mode==='strafe' ? ' · <b>WASD</b> para andar' : '';
-  $('#hudBottom').innerHTML = `<b>${modeLabel(mode, mode==='spray'?S.weapon:null)}</b>${info}${extra} · Esc para pausar`;
-  const K = {tracking:['Na cabeça','No corpo'], spray:['No círculo','Média spray'], preaim:['Pontos','Headshots'], strafe:['Abates','Tiros parados']}[mode] || ['Abates','Precisão'];
+  $('#hudBottom').innerHTML = `<b>${modeLabel(mode, mode==='spray'?S.weapon:null)}</b>${info}${extra}` + (isMobile() ? '' : ' · Esc para pausar');
+  const K = {tracking:['Na cabeça','No corpo'], spray:['No círculo','Média spray'], preaim:['Pontos','Headshots'], sniper:['Pontos','Headshots'], strafe:['Abates','Tiros parados']}[mode] || ['Abates','Precisão'];
   $('#hScoreK').textContent = K[0]; $('#hAccK').textContent = K[1];
 }
 function startPlaying(){
@@ -1011,7 +1387,7 @@ function endBlock(){
   const sum = summarize();
   if(stats.shotMap.length) sum.shotMap = stats.shotMap.slice();
   const b = curBlock();
-  const variant = mode === 'spray' ? S.weapon : '';
+  const variant = mode === 'spray' ? S.weapon : (isMobile() ? 'mobile' : '');
   const prev = bestFor(mode, variant);
   run.results.push(Object.assign({mode, variant, mult:b.mult, prevBest:prev}, sum));
   if(run.kind !== 'senstest') pushHistory(mode, variant, sum.score, sum.display);
@@ -1034,6 +1410,12 @@ function summarize(){
     return {score: Math.round(sp*1000)/10, display: (sp*100).toFixed(1)+'%', lines:[
       ['Média por spray', (sp*100).toFixed(1)+'%'], ['Melhor spray', (best*100).toFixed(0)+'%'],
       ['Sprays (10+ tiros)', stats.sprays.length], ['Tiros no círculo', stats.hits+' / '+stats.shots]]};
+  }
+  if(mode === 'sniper'){
+    const seen = stats.kills + stats.escaped, ttk2 = avg(stats.ttks);
+    return {score: stats.points, display: stats.points.toLocaleString('pt-BR'), hip:stats.hip||0, lines:[
+      ['Headshots', `${stats.heads} / ${seen}`], ['Só corpo', stats.bodies], ['Escaparam', stats.escaped],
+      ['Tempo por abate', ttk2 ? Math.round(ttk2)+' ms' : '—'], ['Precisão', (acc*100).toFixed(0)+'%'], ['Tiros sem luneta', stats.hip||0]]};
   }
   if(mode === 'preaim'){
     const rt = avg(stats.reaction), pe = avg(stats.placeErr), ve = avg(stats.vertErr);
@@ -1073,6 +1455,12 @@ function tipFor(r){
     if(r.still < 0.8) t += ' Muitos tiros saíram andando: espere a velocidade ficar verde antes de clicar.';
     return t;
   }
+  if(r.mode === 'sniper'){
+    let t = 'Abra a luneta antes de atirar: sem ela o tiro sai com dispersão grande. Depois de cada disparo há uma pausa de quase 1 segundo, então errar custa caro.';
+    if(r.hip > 2) t += ` Você deu ${r.hip} tiros sem luneta.`;
+    if(S.mobile.fireRelease) t += ' Você está com "atirar ao soltar o dedo" ligado: mire com o dedo no botão e solte para disparar.';
+    return t;
+  }
   if(r.mode === 'tracking') return 'Mire na cabeça: o tempo no corpo vale 40% na pontuação. Acompanhe as paradas bruscas sem passar do alvo.';
   return '';
 }
@@ -1086,6 +1474,7 @@ function finishRun(){
   try{ document.exitPointerLock(); }catch(e){}
   $('#hud').style.display = 'none'; $('#xhair').style.display = 'none'; $('#countdown').classList.add('hidden');
   setSceneFor(null); clearTargets(); clearImpacts(); eye.set(0,0,0); punch.x = punch.y = 0;
+  setAds(false); setPlaying(false); touches.clear();
   $('#results').classList.remove('hidden');
   $('#rExtra').innerHTML = ''; $('#rStats').innerHTML = '';
   if(run.kind === 'senstest') return renderSensResults();
@@ -1103,7 +1492,7 @@ function finishRun(){
   if(r.shotMap && r.shotMap.length) drawShotMap($('#shotMap'), r.shotMap);
 }
 function shotMapHTML(r){
-  const pts = r.shotMap, head = r.mode === 'preaim' || r.mode === 'strafe';
+  const pts = r.shotMap, head = r.mode === 'preaim' || r.mode === 'strafe' || r.mode === 'sniper';
   const n = k => pts.filter(p=>p.k===k).length;
   const legend = `<div class="lg"><span><i style="background:#3dff8a"></i>${head?'Cabeça':'Acerto'} (${n('hit')})</span>` +
     (head ? `<span><i style="background:#f5c542"></i>Corpo (${n('body')})</span>` : '') +
@@ -1155,6 +1544,7 @@ function renderSensResults(){
   const rows = run.results.slice().sort((a,b)=>a.mult-b.mult);
   const best = rows.reduce((a,b)=> b.score > a.score ? b : a, rows[0]);
   $('#rMode').textContent = MODES.senstest.name;
+  if(isMobile()) return renderSensResultsMobile(rows, best);
   $('#rScore').textContent = (S.sens*best.mult).toFixed(2);
   $('#rBest').innerHTML = `<span class="pill ok">Melhor desempenho com ${best.mult}× da sua sens</span>`;
   let html = '<table><tr><th>Multiplicador</th><th>Sens CS2</th><th>cm/360</th><th>Pontos</th><th>Precisão</th><th>Tempo/alvo</th><th>Over/Under</th></tr>';
@@ -1172,6 +1562,19 @@ function renderSensResults(){
   }
   $('#rExtra').innerHTML = html + `<div class="note">${tip}</div>`;
   pushHistory('senstest', '', best.mult, `melhor: ${(S.sens*best.mult).toFixed(2)} (${best.mult}×)`, true);
+}
+
+function renderSensResultsMobile(rows, best){
+  const base = prof().geral, val = m => Math.round(base/m);
+  $('#rScore').textContent = val(best.mult) + '%';
+  $('#rBest').innerHTML = `<span class="pill ok">Melhor desempenho com ${best.mult}× da sua sensibilidade</span>`;
+  let html = '<table><tr><th>Multiplicador</th><th>Arraste p/ 180°</th><th>Pontos</th><th>Precisão</th><th>Tempo/alvo</th><th>Over/Under</th></tr>';
+  rows.forEach(r=>{ html += `<tr${r===best?' class="best"':''}><td>${r.mult}×</td><td>${val(r.mult)}%</td><td>${r.score}</td><td>${(r.acc*100).toFixed(1)}%</td><td>${r.ttk?Math.round(r.ttk)+' ms':'—'}</td><td>${r.over}/${r.under}</td></tr>`; });
+  html += '</table>';
+  const tip = best.mult === 1 ? 'Sua sensibilidade atual teve o melhor resultado.'
+    : `Você foi melhor com ${val(best.mult)}% (arraste para 180°). Repita o teste antes de mudar no jogo. Se mudar, ajuste a sensibilidade "sem mira" do ${MGAMES[S.mobile.game]} até o arraste para 180° ficar nesse valor.`;
+  $('#rExtra').innerHTML = html + `<div class="note">${tip}</div>`;
+  pushHistory('senstest', 'mobile', best.mult, `melhor: ${val(best.mult)}% (${best.mult}×)`, true);
 }
 
 /* ---------- Histórico e gráfico ---------- */
@@ -1276,7 +1679,7 @@ function drawXhair(cv, k, cssSize){
 }
 function drawCrosshairs(){
   const xc = $('#xhair');
-  drawXhair(xc, innerHeight/480, [160,160]);
+  drawXhair(xc, isMobile() ? 2 : innerHeight/480, [160,160]);
   xc.style.transform = `translate(-50%,-50%) scaleX(${xhScaleX})`;
   drawXhair($('#xprev'), 1080/480, [120,110]);
 }
@@ -1298,6 +1701,52 @@ function decodeXhCode(code){
 }
 
 /* ---------- Menu / UI ---------- */
+function renderModes(){
+  const mob = isMobile();
+  $('#modes').innerHTML = Object.entries(MODES).filter(([k,m])=>!m.only || m.only === (mob ? 'mobile' : 'pc')).map(([k,m])=>
+    `<button class="mode${m.featured?' featured':''}" data-mode="${k}"><div class="tag">${(mob && m.tagM) || m.tag}</div><div class="t">${m.name}${m.isNew?'<span class="new">NOVO</span>':''}</div><div class="d">${(mob && m.descM) || m.desc}</div><div class="b">${k==='warmup'?'Começar aquecimento →':'Jogar →'}</div></button>`).join('');
+  document.querySelectorAll('.mode').forEach(b=>b.addEventListener('click', ()=>startRun(b.dataset.mode)));
+}
+function applyDevice(){
+  document.body.classList.toggle('is-mobile', isMobile());
+  renderModes(); applyAspect(); positionButtons();
+}
+function syncMobileUI(){
+  const P = prof(), M = S.mobile;
+  $('#mGame').value = M.game;
+  $('#mSensGeral').value = P.geral; $('#mSensMira').value = P.mira; $('#mSensLuneta').value = P.luneta;
+  $('#mFov').value = P.hfov; $('#vFov').textContent = P.hfov + '°';
+  $('#mFireRel').checked = M.fireRelease; $('#mAutoFs').checked = M.autoFs;
+  $('#mGyro').value = M.gyro; $('#mGyroSens').value = M.gyroSens; $('#vGyro').textContent = M.gyroSens.toFixed(2);
+  $('#mGyroX').checked = M.gyroInvX; $('#mGyroY').checked = M.gyroInvY;
+}
+function initMobileUI(){
+  const M = S.mobile, save = ()=>{ saveSettings(); syncMobileUI(); updateFov(); };
+  $('#sDevice').value = S.device;
+  $('#sDevice').addEventListener('change', ()=>{ S.device = $('#sDevice').value; saveSettings(); applyDevice(); });
+  $('#mGame').addEventListener('change', ()=>{ M.game = $('#mGame').value; save(); });
+  [['#mSensGeral','geral'],['#mSensMira','mira'],['#mSensLuneta','luneta']].forEach(([id,k])=>$(id).addEventListener('input', ()=>{ const v = parseFloat($(id).value); if(v >= 15 && v <= 900){ prof()[k] = v; saveSettings(); } }));
+  $('#mFov').addEventListener('input', ()=>{ prof().hfov = parseInt($('#mFov').value,10); save(); });
+  $('#mFireRel').addEventListener('change', ()=>{ M.fireRelease = $('#mFireRel').checked; save(); });
+  $('#mAutoFs').addEventListener('change', ()=>{ M.autoFs = $('#mAutoFs').checked; save(); });
+  $('#mGyro').addEventListener('change', ()=>{ M.gyro = $('#mGyro').value; save(); requestGyroPermission(); });
+  $('#mGyroSens').addEventListener('input', ()=>{ M.gyroSens = parseFloat($('#mGyroSens').value); save(); });
+  $('#mGyroX').addEventListener('change', ()=>{ M.gyroInvX = $('#mGyroX').checked; save(); });
+  $('#mGyroY').addEventListener('change', ()=>{ M.gyroInvY = $('#mGyroY').checked; save(); });
+  document.querySelectorAll('[data-cal]').forEach(b=>b.addEventListener('click', ()=>openCalib(b.dataset.cal)));
+  $('#chRange').addEventListener('input', ()=>setCalibValue(parseFloat($('#chRange').value)));
+  $('#chNum').addEventListener('input', ()=>{ const v = parseFloat($('#chNum').value); if(v >= 15) setCalibValue(v); });
+  $('#chZero').addEventListener('click', ()=>{ yaw = 0; pitch = 0; });
+  $('#chDone').addEventListener('click', ()=>closeCalib(true));
+  $('#chCancel').addEventListener('click', ()=>closeCalib(false));
+  $('#mLayoutBtn').addEventListener('click', openLayout);
+  $('#lbSize').addEventListener('input', ()=>{ S.mobile.layout[layoutSel].s = parseInt($('#lbSize').value,10); positionButtons(); saveSettings(); });
+  $('#lbFireL').addEventListener('change', ()=>{ S.mobile.layout.fireL.on = $('#lbFireL').checked; positionButtons(); saveSettings(); });
+  $('#lbReset').addEventListener('click', ()=>{ const D = DEFAULTS.mobile.layout; for(const k in D) S.mobile.layout[k] = Object.assign({}, D[k]); positionButtons(); selectLayoutBtn(layoutSel); $('#lbFireL').checked = true; saveSettings(); });
+  $('#lbDone').addEventListener('click', closeLayout);
+  addEventListener('resize', ()=>{ if(isMobile() && innerHeight > innerWidth && (state === 'playing' || state === 'countdown')) pauseGame('Gire o celular para a horizontal e toque em Continuar.'); });
+  syncMobileUI(); document.body.classList.toggle('is-mobile', isMobile());
+}
 function cm360(sens){ return 360/(M_YAW*sens) / S.dpi * 2.54; }
 function updateDerived(){
   $('#dEdpi').textContent = Math.round(S.sens*S.dpi);
@@ -1324,12 +1773,13 @@ function showMenu(){
   $('#menu').classList.remove('hidden');
   $('#hud').style.display = 'none'; $('#xhair').style.display = 'none'; $('#countdown').classList.add('hidden');
   clearTargets(); clearImpacts(); setSceneFor(null); eye.set(0,0,0); punch.x = punch.y = 0;
+  setAds(false); setPlaying(false); touches.clear(); calGroup.visible = false;
+  $('#calHud').classList.add('hidden'); $('#layoutBar').classList.add('hidden'); $('#mbtns').classList.remove('edit');
   renderHistory(); renderChartSelect(); drawChart();
 }
 function initUI(){
-  $('#modes').innerHTML = Object.entries(MODES).map(([k,m])=>
-    `<button class="mode${m.featured?' featured':''}" data-mode="${k}"><div class="tag">${m.tag}</div><div class="t">${m.name}${m.isNew?'<span class="new">NOVO</span>':''}</div><div class="d">${m.desc}</div><div class="b">${k==='warmup'?'Começar aquecimento →':'Jogar →'}</div></button>`).join('');
-  document.querySelectorAll('.mode').forEach(b=>b.addEventListener('click', ()=>startRun(b.dataset.mode)));
+  renderModes();
+  initMobileUI();
   $('#sWeapon').innerHTML = Object.entries(WEAPONS).map(([k,w])=>`<option value="${k}">${w.name} · ${w.mag}</option>`).join('');
   $('#cvGame').innerHTML = Object.entries(GAMES).map(([k,g])=>`<option value="${k}">${g.name}</option>`).join('');
   $('#cvGame').value = S.cvGame;
@@ -1374,7 +1824,11 @@ function initUI(){
   $('#calRef').addEventListener('change', ()=>{ $('#calCustomRow').classList.toggle('hidden', $('#calRef').value !== 'custom'); });
   // navegação
   $('#fsBtn').addEventListener('click', ()=>{ try{ const p = document.documentElement.requestFullscreen(); if(p&&p.catch) p.catch(()=>{}); }catch(e){} });
-  $('#resumeBtn').addEventListener('click', ()=>{ ensureAudio(); requestLock(); });
+  $('#resumeBtn').addEventListener('click', ()=>{
+    ensureAudio();
+    if(isMobile()){ if(innerHeight > innerWidth) return; $('#pause').classList.add('hidden'); state = resumeState; enterFullscreen(); }
+    else requestLock();
+  });
   $('#quitBtn').addEventListener('click', showMenu);
   $('#againBtn').addEventListener('click', ()=>startRun(run.kind));
   $('#menuBtn').addEventListener('click', showMenu);
@@ -1383,7 +1837,7 @@ function initUI(){
   $('#chart').addEventListener('mousemove', chartHover);
   $('#chart').addEventListener('mouseleave', ()=>{ $('#chartTip').style.display = 'none'; });
   addEventListener('resize', ()=>{ if(state==='menu') drawChart(); });
-  updateDerived(); syncXhUI(); applyAspect(); renderHistory(); renderChartSelect(); drawChart();
+  updateDerived(); syncXhUI(); applyDevice(); renderHistory(); renderChartSelect(); drawChart();
 }
 
 /* ---------- PWA (modo offline) ---------- */
@@ -1403,6 +1857,7 @@ function updateHUD(){
     if(run.kind === 'warmup') sub += ` · ${Math.round(b.dur/60*10)/10} min`;
     if(mode === 'strafe') sub = (sub?sub+' · ':'') + 'Faça strafe com A/D, pare e atire';
     if(mode === 'preaim') sub = (sub?sub+' · ':'') + 'Segure as quinas na altura da cabeça';
+    if(mode === 'sniper') sub = (sub?sub+' · ':'') + 'Toque em MIRA para abrir a luneta';
     cd.innerHTML = Math.ceil(left/1000) + (sub ? `<small>${sub}</small>` : '');
     $('#hTime').textContent = b.dur.toFixed(1);
   } else cd.classList.add('hidden');
@@ -1421,8 +1876,9 @@ function updateHUD(){
     sc.textContent = stats.shots ? pct(stats.hits, stats.shots).toFixed(0)+'%' : '—';
     ac.textContent = stats.sprays.length ? (avg(stats.sprays)*100).toFixed(0)+'%' : '—';
     $('#hudAmmo').innerHTML = `<span class="w">${W.name}</span>${W.mag - sprayIdx}<small>/${W.mag}</small>`;
-  } else if(mode === 'preaim'){
+  } else if(mode === 'preaim' || mode === 'sniper'){
     sc.textContent = stats.points; ac.textContent = stats.heads;
+    if(mode === 'sniper') $('#m_fire').classList.toggle('cool', clock < sn.cooldownUntil);
   } else if(mode === 'strafe'){
     sc.textContent = stats.kills; ac.textContent = stats.shots ? pct(stats.still, stats.shots).toFixed(0)+'%' : '—';
     const sp = $('#hSpeed'); sp.textContent = Math.round(mv.speed); sp.style.color = mv.speed <= ACCURATE ? '#3dff8a' : '#ff5468';
@@ -1446,6 +1902,7 @@ function loop(t){
       else if(mode === 'spray') updateSpray();
       else if(mode === 'preaim') updatePreaim();
       else if(mode === 'strafe') updateStrafe(dt);
+      else if(mode === 'sniper') updateSniper(dt);
       if(clock >= runEnd) endBlock();
     }
   }
