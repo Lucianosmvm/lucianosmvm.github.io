@@ -111,6 +111,11 @@ th{color:var(--muted);font-weight:500;font-size:11.5px;text-transform:uppercase;
 .note{background:rgba(245,165,36,.08);border:1px solid rgba(245,165,36,.25);border-radius:10px;padding:10px 12px;font-size:13px;line-height:1.5;text-align:left;margin-top:12px}
 .chartwrap{position:relative}
 #chart{width:100%;height:230px;display:block}
+.shotwrap{display:flex;gap:20px;align-items:center;justify-content:center;flex-wrap:wrap;margin-top:4px;text-align:left}
+.shotinfo{max-width:330px;font-size:13px;line-height:1.5}
+.shotinfo h5{margin:0 0 6px;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.lg{display:flex;gap:14px;flex-wrap:wrap;margin:6px 0 10px;color:var(--muted);font-size:12.5px}
+.lg i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px;vertical-align:0}
 #chartTip{position:absolute;pointer-events:none;background:#0b0f16;border:1px solid var(--line);border-radius:8px;padding:6px 9px;font-size:12px;line-height:1.4;white-space:nowrap;transform:translate(-50%,-115%);display:none}
 #chartTip b{font-family:Rajdhani,Inter,sans-serif;font-size:16px}
 </style>
@@ -165,6 +170,7 @@ th{color:var(--muted);font-weight:500;font-size:11.5px;text-transform:uppercase;
           <div class="field"><label for="sDur">Duração da rodada</label><select id="sDur"><option value="30">30 s</option><option value="60">60 s</option><option value="90">90 s</option></select></div>
           <div class="field"><label for="sWarm">Duração do aquecimento</label><select id="sWarm"><option value="5">5 min</option><option value="10">10 min</option><option value="15">15 min</option></select></div>
           <div class="field"><label for="sAspect">Proporção da tela</label><select id="sAspect"><option value="native">Nativa</option><option value="stretched">4:3 esticado</option><option value="black">4:3 com barras</option></select></div>
+          <div class="field"><label for="sMark">Marcar tiros errados</label><input type="checkbox" id="sMark"></div>
           <div class="field"><label for="sVol">Volume</label><input type="range" id="sVol" min="0" max="1" step="0.05"></div>
 
           <h4>Spray</h4>
@@ -309,7 +315,7 @@ const esc = s => String(s).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&
 /* ---------- Persistência ---------- */
 function loadJSON(k,d){ try{ const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; }catch(e){ return d; } }
 function saveJSON(k,v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} }
-const DEFAULTS = {sens:1.25,dpi:800,factor:1,duration:60,warmup:10,aspect:'native',volume:0.5,showPattern:true,aimPunch:true,weapon:'ak47',
+const DEFAULTS = {sens:1.25,dpi:800,factor:1,duration:60,warmup:10,aspect:'native',volume:0.5,markMiss:true,showPattern:true,aimPunch:true,weapon:'ak47',
   cvGame:'valorant',
   xh:{size:2.5,gap:-1.5,thick:1,outline:true,outlineThick:1,dot:false,tstyle:false,color:1,r:50,g:250,b:50,alpha:255,alphaEn:true}};
 const saved = loadJSON('aimcs_settings', {});
@@ -478,6 +484,52 @@ function rayFirst(dir, objs){
   return h.length ? h[0].object : null;
 }
 function angleBetween(a, b){ return Math.acos(Math.min(1, Math.max(-1, a.dot(b)))) / DEG; }
+function dirAngles(d){ return {yaw: Math.atan2(-d.x, -d.z)/DEG, pitch: Math.asin(Math.max(-1, Math.min(1, d.y)))/DEG}; }
+
+/* ---------- Marcas de tiro e mapa de tiros ---------- */
+const impactDotGeo = new THREE.CircleGeometry(1, 20);
+const impactRingGeo = new THREE.RingGeometry(1, 1.5, 24);
+const impacts = [];
+for(let i=0;i<40;i++){
+  const g = new THREE.Group();
+  const ring = new THREE.Mesh(impactRingGeo, new THREE.MeshBasicMaterial({color:0x000000, transparent:true, depthWrite:false}));
+  const dot = new THREE.Mesh(impactDotGeo, new THREE.MeshBasicMaterial({color:0xff4d5e, transparent:true, depthWrite:false}));
+  ring.renderOrder = 5; dot.renderOrder = 6;
+  g.add(ring, dot); g.visible = false; scene.add(g); impacts.push({g, ring, dot, born:-1e9});
+}
+let impactIdx = 0;
+const IMPACT_LIFE = 2000;
+function markImpact(dir){
+  if(!S.markMiss) return;
+  scene.updateMatrixWorld();
+  raycaster.set(eye, dir);
+  const objs = [room, floor]; if(preGroup.visible) objs.push(...preGroup.children);
+  const h = raycaster.intersectObjects(objs, false)[0]; if(!h) return;
+  const n = h.face ? h.face.normal.clone().transformDirection(h.object.matrixWorld) : dir.clone().negate();
+  if(n.dot(dir) > 0) n.negate();
+  const it = impacts[impactIdx++ % impacts.length];
+  const size = Math.max(0.02, h.distance * Math.tan(0.28*DEG));   // ~0,28° de tamanho na tela, perto ou longe
+  it.g.position.copy(h.point).addScaledVector(n, 0.02);
+  it.g.lookAt(it.g.position.clone().add(n));
+  it.g.scale.setScalar(size); it.g.visible = true; it.born = clock;
+}
+function updateImpacts(){
+  for(const it of impacts){
+    if(!it.g.visible) continue;
+    const age = clock - it.born;
+    if(age > IMPACT_LIFE || age < 0){ it.g.visible = false; continue; }
+    const a = age < IMPACT_LIFE-500 ? 1 : (IMPACT_LIFE-age)/500;
+    it.dot.material.opacity = a; it.ring.material.opacity = 0.75*a;
+  }
+}
+function clearImpacts(){ impacts.forEach(it=>it.g.visible = false); }
+// Guarda onde o tiro passou em relação ao centro do alvo, em "raios do alvo" (1 = borda)
+function recordShot(dir, pos, r, kind){
+  if(stats.shotMap.length >= 400) return;
+  const a = dirAngles(dir), t = angTo(pos);
+  const dist = pos.clone().sub(eye).length(); const ar = Math.asin(Math.min(1, r/dist))/DEG;
+  stats.shotMap.push({x: -wrap(a.yaw - t.yaw)/ar, y: (a.pitch - t.pitch)/ar, k:kind});
+}
 
 /* ---------- Áudio ---------- */
 let actx = null, noiseBuf = null;
@@ -517,7 +569,7 @@ let promptText = '', promptColor = '', promptUntil = 0;
 const SENSTEST_BLOCK = 20;
 
 function newStats(){ return {shots:0,hits:0,kills:0,heads:0,bodies:0,escaped:0,ttks:[],over:0,under:0,
-  headT:0,bodyT:0,total:0,sprays:[],still:0,stopTimes:[],placeErr:[],vertErr:[],reaction:[],points:0}; }
+  headT:0,bodyT:0,total:0,sprays:[],still:0,stopTimes:[],placeErr:[],vertErr:[],reaction:[],points:0,shotMap:[]}; }
 const curBlock = () => run.plan[run.idx];
 
 /* ---------- Pointer lock ---------- */
@@ -691,6 +743,13 @@ function shoot(){
   const d = aimDir();
   let hit = null;
   for(const t of targets){ if(aimHitsSphere(d, t.pos, t.r)){ hit = t; break; } }
+  let ref = hit;
+  if(!ref && targets.length){
+    const ang = t => angleBetween(d, t.pos.clone().sub(eye).normalize());
+    ref = targets.reduce((b,t)=> ang(t) < ang(b) ? t : b);
+  }
+  if(ref) recordShot(d, ref.pos, ref.r, hit ? 'hit' : 'miss');
+  if(!hit) markImpact(d);
   if(hit){
     stats.hits++; stats.kills++;
     stats.ttks.push(mode==='gridshot' ? clock - lastKill : clock - hit.born);
@@ -813,9 +872,12 @@ function updatePreaim(){
 }
 function shootPreaim(){
   stats.shots++;
-  if(!preBot.visible){ sndMiss(); return; }
+  const d = aimDir();
+  if(!preBot.visible){ sndMiss(); markImpact(d); return; }
   const {head, body} = preBot.userData;
-  const obj = rayFirst(aimDir(), pre.walls.map(w=>w.mesh).concat([head, body]));
+  const obj = rayFirst(d, pre.walls.map(w=>w.mesh).concat([head, body]));
+  recordShot(d, head.getWorldPosition(new THREE.Vector3()), 0.22, obj === head ? 'hit' : obj === body ? 'body' : 'miss');
+  if(obj !== head && obj !== body) markImpact(d);
   if(obj === head || obj === body){
     const isHead = obj === head;
     const rt = Math.max(0, clock - pre.appearAt);
@@ -877,9 +939,11 @@ function shootStrafe(){
   const spread = accurate ? 0.08 : 1.2 + sp/MAXSPEED*5;
   const ang = Math.random()*Math.PI*2, r = Math.sqrt(Math.random())*spread;
   const dir = dirFromAngles(yaw + Math.cos(ang)*r, pitch + Math.sin(ang)*r);
-  if(!strafe.target) return;
+  if(!strafe.target){ markImpact(dir); return; }
   const {head, body} = strafeBot.userData;
   const obj = rayFirst(dir, [head, body]);
+  recordShot(dir, head.getWorldPosition(new THREE.Vector3()), 0.22, obj === head ? 'hit' : obj ? 'body' : 'miss');
+  if(!obj) markImpact(dir);
   if(obj){
     const isHead = obj === head;
     stats.hits++; stats.kills++; if(isHead) stats.heads++;
@@ -917,7 +981,7 @@ function setSceneFor(m){
 }
 function beginBlock(){
   const b = curBlock(); mode = b.mode; curMult = b.mult;
-  stats = newStats(); clearTargets(); clearDecals();
+  stats = newStats(); clearTargets(); clearDecals(); clearImpacts();
   firing = false; sprayIdx = 0; lastShot = -1e9; curSpray = null; punch.x = punch.y = 0;
   bot.x = 0; bot.dir = 1; bot.next = 0; bot.stopUntil = 0;
   eye.set(0,0,0); mv.vx = mv.vz = mv.speed = 0; mv.armed = false; mv.brakeStart = null; moveAcc = 0; strafe.target = false;
@@ -945,6 +1009,7 @@ function endBlock(){
   if(mode === 'spray') finalizeSpray();
   clearTargets();
   const sum = summarize();
+  if(stats.shotMap.length) sum.shotMap = stats.shotMap.slice();
   const b = curBlock();
   const variant = mode === 'spray' ? S.weapon : '';
   const prev = bestFor(mode, variant);
@@ -1020,7 +1085,7 @@ function finishRun(){
   state = 'results';
   try{ document.exitPointerLock(); }catch(e){}
   $('#hud').style.display = 'none'; $('#xhair').style.display = 'none'; $('#countdown').classList.add('hidden');
-  setSceneFor(null); clearTargets(); eye.set(0,0,0); punch.x = punch.y = 0;
+  setSceneFor(null); clearTargets(); clearImpacts(); eye.set(0,0,0); punch.x = punch.y = 0;
   $('#results').classList.remove('hidden');
   $('#rExtra').innerHTML = ''; $('#rStats').innerHTML = '';
   if(run.kind === 'senstest') return renderSensResults();
@@ -1030,7 +1095,49 @@ function finishRun(){
   $('#rScore').textContent = r.display;
   $('#rStats').innerHTML = r.lines.map(([k,v])=>`<div><div class="k">${k}</div><div class="v">${v}</div></div>`).join('');
   $('#rBest').innerHTML = bestBadge(r);
-  const tip = tipFor(r); if(tip) $('#rExtra').innerHTML = `<div class="note">${tip}</div>`;
+  const tip = tipFor(r);
+  let html = '';
+  if(r.shotMap && r.shotMap.length) html += shotMapHTML(r);
+  if(tip) html += `<div class="note">${tip}</div>`;
+  $('#rExtra').innerHTML = html;
+  if(r.shotMap && r.shotMap.length) drawShotMap($('#shotMap'), r.shotMap);
+}
+function shotMapHTML(r){
+  const pts = r.shotMap, head = r.mode === 'preaim' || r.mode === 'strafe';
+  const n = k => pts.filter(p=>p.k===k).length;
+  const legend = `<div class="lg"><span><i style="background:#3dff8a"></i>${head?'Cabeça':'Acerto'} (${n('hit')})</span>` +
+    (head ? `<span><i style="background:#f5c542"></i>Corpo (${n('body')})</span>` : '') +
+    `<span><i style="background:#ff5468"></i>Erro (${n('miss')})</span></div>`;
+  return `<div class="shotwrap"><canvas id="shotMap" style="width:260px;height:260px"></canvas><div class="shotinfo"><h5>Mapa de tiros</h5>` +
+    `Cada ponto é um tiro, na posição em que passou em relação ${head?'à cabeça do inimigo':'ao alvo'} (o círculo azul). Os anéis tracejados ficam a 2, 3 e 4 vezes o tamanho ${head?'da cabeça':'do alvo'}; tiros mais longe aparecem na borda.` +
+    legend + `<b>${biasText(pts)}</b></div></div>`;
+}
+function biasText(pts){
+  const m = pts.filter(p=>p.k==='miss'); if(m.length < 4) return 'Poucos erros para apontar uma tendência. Ótimo sinal.';
+  const cl = v => Math.max(-4, Math.min(4, v));
+  const mx = avg(m.map(p=>cl(p.x))), my = avg(m.map(p=>cl(p.y)));
+  const parts = [];
+  if(Math.abs(mx) > 0.6) parts.push(mx > 0 ? 'à direita' : 'à esquerda');
+  if(Math.abs(my) > 0.6) parts.push(my > 0 ? 'acima' : 'abaixo');
+  return parts.length ? `Seus tiros errados tendem a cair ${parts.join(' e ')} do alvo.` : 'Seus erros estão espalhados em volta do alvo, sem tendência clara para um lado.';
+}
+function drawShotMap(cv, pts){
+  const dpr = window.devicePixelRatio || 1, W = 260;
+  cv.width = W*dpr; cv.height = W*dpr; const g = cv.getContext('2d'); g.setTransform(dpr,0,0,dpr,0,0);
+  const c = W/2, R = W/2 - 10, per = R/4;
+  g.strokeStyle = 'rgba(139,151,168,0.18)'; g.lineWidth = 1;
+  g.beginPath(); g.moveTo(c, 6); g.lineTo(c, W-6); g.moveTo(6, c); g.lineTo(W-6, c); g.stroke();
+  g.setLineDash([3,4]); g.strokeStyle = 'rgba(139,151,168,0.35)';
+  for(let k=2;k<=4;k++){ g.beginPath(); g.arc(c, c, per*k, 0, Math.PI*2); g.stroke(); }
+  g.setLineDash([]);
+  g.beginPath(); g.arc(c, c, per, 0, Math.PI*2); g.fillStyle = 'rgba(47,212,255,0.16)'; g.fill();
+  g.lineWidth = 1.5; g.strokeStyle = '#2fd4ff'; g.stroke();
+  const col = {hit:'#3dff8a', body:'#f5c542', miss:'#ff5468'};
+  ['miss','body','hit'].forEach(kind=>pts.filter(p=>p.k===kind).forEach(p=>{
+    let x = p.x, y = p.y; const L = Math.hypot(x, y); if(L > 4){ x *= 4/L; y *= 4/L; }
+    g.beginPath(); g.arc(c + x*per, c - y*per, 3.5, 0, Math.PI*2);
+    g.fillStyle = col[kind]; g.fill(); g.lineWidth = 1.5; g.strokeStyle = '#121823'; g.stroke();
+  }));
 }
 function renderWarmupResults(){
   $('#rMode').textContent = `Aquecimento · ${S.warmup} min`;
@@ -1216,7 +1323,7 @@ function showMenu(){
   ['#results','#pause'].forEach(s=>$(s).classList.add('hidden'));
   $('#menu').classList.remove('hidden');
   $('#hud').style.display = 'none'; $('#xhair').style.display = 'none'; $('#countdown').classList.add('hidden');
-  clearTargets(); setSceneFor(null); eye.set(0,0,0); punch.x = punch.y = 0;
+  clearTargets(); clearImpacts(); setSceneFor(null); eye.set(0,0,0); punch.x = punch.y = 0;
   renderHistory(); renderChartSelect(); drawChart();
 }
 function initUI(){
@@ -1236,7 +1343,7 @@ function initUI(){
     }); };
   bind('#sSens','sens',parseFloat); bind('#sDpi','dpi',parseFloat); bind('#sFac','factor',parseFloat);
   bind('#sDur','duration',v=>parseInt(v,10),'change'); bind('#sWarm','warmup',v=>parseInt(v,10),'change');
-  bind('#sAspect','aspect',null,'change'); bind('#sVol','volume',parseFloat);
+  bind('#sAspect','aspect',null,'change'); bind('#sVol','volume',parseFloat); bind('#sMark','markMiss',null,'change');
   bind('#sWeapon','weapon',null,'change'); bind('#sPat','showPattern',null,'change'); bind('#sPunch','aimPunch',null,'change');
   $('#sVol').value = S.volume;
   // crosshair
@@ -1349,6 +1456,7 @@ function loop(t){
     const k = e.t/0.22; e.m.scale.setScalar(e.r*(1+k*1.6)); e.m.material.opacity = 0.6*(1-k);
     if(k >= 1){ scene.remove(e.m); e.m.material.dispose(); effects.splice(i,1); }
   }
+  updateImpacts();
   updateHUD();
   camera.position.copy(eye);
   camera.rotation.set((pitch + punch.y)*DEG, (yaw - punch.x)*DEG, 0);
