@@ -188,7 +188,7 @@ body.is-mobile #hudBottom{left:66px}
 <div id="scope" class="hidden"></div><div id="scopeDot" class="hidden"></div>
 <div id="mbtns">
   <div id="mPause">II</div>
-  <div class="mbtn" id="m_fireL" data-b="fireL"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2" fill="currentColor"/></svg>Tiro</div>
+  <div class="mbtn" id="m_fireL" data-b="fireL"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2" fill="currentColor"/></svg>Só tiro</div>
   <div class="mbtn" id="m_ads" data-b="ads"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="8"/><path d="M12 2v6M12 16v6M2 12h6M16 12h6"/></svg>Mira</div>
   <div class="mbtn" id="m_fire" data-b="fire"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2" fill="currentColor"/></svg>Tiro</div>
 </div>
@@ -315,7 +315,7 @@ body.is-mobile #hudBottom{left:66px}
           <h3>Modos de treino</h3>
           <div class="modes" id="modes"></div>
           <p class="hint pc-only" style="margin-top:12px">Clique num modo para travar o mouse e começar. <b>Esc</b> pausa. Funciona melhor no Chrome ou Edge, que suportam raw input.</p>
-          <p class="hint mobile-only" style="margin-top:12px">Jogue com o celular na horizontal. Arraste o dedo em qualquer lugar da tela para mirar; dá para arrastar segurando o botão de tiro, como nos jogos. O botão <b>II</b> pausa.</p>
+          <p class="hint mobile-only" style="margin-top:12px">Jogue com o celular na horizontal. Arraste o dedo em qualquer lugar da tela para mirar. O tiro da <b>direita</b> atira e mira junto se você arrastar; o da <b>esquerda</b> só atira, sem mexer a mira (bom para o 3º dedo). O botão <b>II</b> pausa.</p>
         </div>
         <div class="card">
           <div class="row" style="justify-content:space-between;margin-bottom:8px">
@@ -1164,7 +1164,8 @@ document.addEventListener('touchmove', e=>{
   const k = touchDegPerPx()*curMult;
   for(const t of e.changedTouches){
     const o = touches.get(t.identifier); if(!o) continue;
-    if(o.role === 'aim' || o.role === 'fire' || o.role === 'fireL') rotateBy(-(t.clientX - o.x)*k, -(t.clientY - o.y)*k);
+    // Tiro direito atira e mira junto; tiro esquerdo só atira (seguro para o 3º dedo)
+    if(o.role === 'aim' || o.role === 'fire') rotateBy(-(t.clientX - o.x)*k, -(t.clientY - o.y)*k);
     o.x = t.clientX; o.y = t.clientY;
     if(state === 'calib' && o.role === 'aim') calibLive(o);
   }
@@ -1262,7 +1263,7 @@ function closeCalib(save){
 }
 
 /* ---------- Editor de botões (mobile) ---------- */
-const LAYOUT_NAMES = {fire:'Tiro', fireL:'Tiro esquerdo', ads:'Mira'};
+const LAYOUT_NAMES = {fire:'Tiro direito (atira e mira)', fireL:'Tiro esquerdo (só atira)', ads:'Mira'};
 let layoutSel = 'fire', layoutDrag = null;
 function openLayout(){
   state = 'layout'; $('#menu').classList.add('hidden');
